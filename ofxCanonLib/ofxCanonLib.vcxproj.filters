@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{d29f69da-d239-478d-974b-6fa245b84d6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ofxCanon">
+      <UniqueIdentifier>{5f64a2df-3166-45a3-98c8-bd64428fe01b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libs">
+      <UniqueIdentifier>{b89ef8e1-6a14-491c-ae28-d355171f4b21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libs\EDSDK">
+      <UniqueIdentifier>{f376a6ab-17a4-42f9-8e5f-4c91218e006a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libs\EDSDK\include">
+      <UniqueIdentifier>{0eab3fee-a8df-491b-9508-108bb7373278}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\ofxCanon.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxCanon\Device.h">
+      <Filter>src\ofxCanon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxCanon\Initializer.h">
+      <Filter>src\ofxCanon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxCanon\Constants.h">
+      <Filter>src\ofxCanon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libs\EDSDK\include\EDSDK.h">
+      <Filter>libs\EDSDK\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libs\EDSDK\include\EDSDKErrors.h">
+      <Filter>libs\EDSDK\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libs\EDSDK\include\EDSDKTypes.h">
+      <Filter>libs\EDSDK\include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\ofxCanon\Device.cpp">
+      <Filter>src\ofxCanon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxCanon\Initializer.cpp">
+      <Filter>src\ofxCanon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxCanon\Handlers.h">
+      <Filter>src\ofxCanon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxCanon\Handlers.cpp">
+      <Filter>src\ofxCanon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxCanon\Constants.cpp">
+      <Filter>src\ofxCanon</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
