@@ -25,13 +25,13 @@
     <ClInclude Include="..\src\ofxCanon.h" />
     <ClInclude Include="..\src\ofxCanon\Device.h" />
     <ClInclude Include="..\src\ofxCanon\Constants.h" />
+    <ClInclude Include="..\src\ofxCanon\Handlers.h" />
     <ClInclude Include="..\src\ofxCanon\Initializer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\ofxCanon\Device.cpp" />
-    <ClCompile Include="..\src\ofxCanon\Handlers.cpp" />
-    <ClCompile Include="..\src\ofxCanon\Handlers.h" />
     <ClCompile Include="..\src\ofxCanon\Constants.cpp" />
+    <ClCompile Include="..\src\ofxCanon\Handlers.cpp" />
     <ClCompile Include="..\src\ofxCanon\Initializer.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -110,7 +110,7 @@
       <AdditionalLibraryDirectories>..\..\..\addons\ofxCanon\libs\EDSDK\lib\vs\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
-      <Command>robocopy "$(ProjectDir)../../../addons/ofxCanon/libs/EDSDK/bin/vs/$(Platform)/" "$(SolutionDir)bin/" "*.dll" /njs /njh /np /fp /bytes
+      <Command>robocopy "$(ProjectDir)../../../addons/ofxCanon/libs/EDSDK/bin/vs/$(Platform)/" "$(SolutionDir)bin/" "*.dll" /njs /njh /np /fp /bytes /E
 if errorlevel 1 exit 0 else exit %errorlevel%</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -132,7 +132,7 @@ if errorlevel 1 exit 0 else exit %errorlevel%</Command>
       <AdditionalLibraryDirectories>..\..\..\addons\ofxCanon\libs\EDSDK\lib\vs\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
-      <Command>robocopy "$(ProjectDir)../../../addons/ofxCanon/libs/EDSDK/bin/vs/$(Platform)/" "$(SolutionDir)bin/" "*.dll" /njs /njh /np /fp /bytes
+      <Command>robocopy "$(ProjectDir)../../../addons/ofxCanon/libs/EDSDK/bin/vs/$(Platform)/" "$(SolutionDir)bin/" "*.dll" /njs /njh /np /fp /bytes /E
 if errorlevel 1 exit 0 else exit %errorlevel%</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>

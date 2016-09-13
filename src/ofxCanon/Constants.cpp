@@ -1,11 +1,17 @@
 #include "Constants.h"
+#include "ofLog.h"
 
 using namespace std;
 
 #define CASE_RETURN(Category, Name) case Category ## _ ## Name: return #Name
 namespace ofxCanon {
 	//----------
-	string ofxCanon::propertyToString(EdsPropertyID propertyID) {
+	void logError(const string & actionName, EdsUInt32 errorCode) {
+		ofLogError("ofxCanon") << actionName << " failed with error " << errorToString(errorCode);
+	}
+
+	//----------
+	string propertyToString(EdsPropertyID propertyID) {
 		switch (propertyID) {
 			// Camera Settings Properties
 			CASE_RETURN(kEdsPropID, Unknown);
@@ -297,6 +303,9 @@ namespace ofxCanon {
 			CASE_RETURN(EDS_ERR, TAKE_PICTURE_NO_LENS_NG);
 			CASE_RETURN(EDS_ERR, TAKE_PICTURE_SPECIAL_MOVIE_MODE_NG);
 			CASE_RETURN(EDS_ERR, TAKE_PICTURE_LV_REL_PROHIBIT_MODE_NG);
+
+		default:
+			return "Unknown";
 		}
 	}
 
@@ -393,6 +402,7 @@ namespace ofxCanon {
 		return encode(getISOEncodings(), isoValue);
 	}
 
+#pragma warning (disable : 4305)
 	//----------
 	const std::map<EdsUInt32, float> & getApertureEncodings() {
 		static map<EdsUInt32, float> ApertureEncodings;
@@ -454,6 +464,7 @@ namespace ofxCanon {
 		}
 		return ApertureEncodings;
 	}
+#pragma warning (default: 4305)
 
 	//----------
 	float decodeAperture(EdsUInt32 apertureEncoded) {
@@ -465,7 +476,7 @@ namespace ofxCanon {
 		return encode(getApertureEncodings(), apertureValue);
 	}
 
-#pragma warning disable C4305
+#pragma warning (disable : 4305)
 	//----------
 	const std::map<EdsUInt32, float> & getShutterSpeedEncodings() {
 		static map<EdsUInt32, float> ShutterSpeedEncodings;
@@ -538,7 +549,7 @@ namespace ofxCanon {
 		}
 		return ShutterSpeedEncodings;
 	}
-#pragma warning restore C4305
+#pragma warning (default: 4305)
 
 	//----------
 	float decodeShutterSpeed(EdsUInt32 shutterSpeedEncoded) {

@@ -39,20 +39,26 @@ namespace ofxCanon {
 		switch (eventType) {
 		case kEdsPropertyEvent_All:
 			device->performInCameraThread([=]() {
-				ofLogNotice("ofxCanon") << "Property event all " << propertyToString(propertyId) << " : " << param;
+				if (device->logDeviceCallbacks) {
+					ofLogNotice("ofxCanon") << "Property event all " << propertyToString(propertyId) << " : " << param;
+				}
 			});
 			break;
 		case kEdsPropertyEvent_PropertyChanged:
 			device->performInCameraThread([=]() {
 				device->pollProperty(propertyId);
-				ofLogNotice("ofxCanon") << "Property changed " << propertyToString(propertyId) << " : " << param;
+				if (device->logDeviceCallbacks) {
+					ofLogNotice("ofxCanon") << "Property changed " << propertyToString(propertyId) << " : " << param;
+				}
 			});
 			break;
 		case kEdsPropertyEvent_PropertyDescChanged:
 			device->performInCameraThread([=]() {
 				auto propertyIdCopy = propertyId;
 				ofNotifyEvent(device->onParameterOptionsChange, propertyIdCopy);
-				ofLogNotice("ofxCanon") << "Property description changed " << propertyToString(propertyId) << " : " << param;
+				if (device->logDeviceCallbacks) {
+					ofLogNotice("ofxCanon") << "Property description changed " << propertyToString(propertyId) << " : " << param;
+				}
 			});
 			break;
 		}

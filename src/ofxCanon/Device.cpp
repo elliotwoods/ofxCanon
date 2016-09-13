@@ -1,11 +1,6 @@
 #include "Device.h"
 
 #include "Initializer.h"
-#include "Handlers.h"
-#include "Constants.h"
-
-#define CHECK_ERROR(ERRORCODE, ACTIONNAME) \
-if(ERRORCODE != EDS_ERR_OK) { ofLogError("ofxCanon") << ACTIONNAME << " failed with error " << errorToString(ERRORCODE); goto fail; }
 
 namespace ofxCanon {
 	//----------
@@ -108,7 +103,16 @@ namespace ofxCanon {
 
 	//----------
 	void Device::idleFunction() {
-		//perform outstanding actions
+		//perform any immediate blocking action
+		{
+			unique_lock<mutex> lock(this->blockingActionMutex);
+			if (this->blockingAction) {
+				this->blockingAction();
+				this->blockingAction = Action(); // clear action
+			}
+		}
+
+		//perform outstanding actions in queue
 		{
 			unique_lock<mutex> lock(this->actionQueueMutex);
 			while (!actionQueue.empty()) {
@@ -120,24 +124,48 @@ namespace ofxCanon {
 	}
 
 	//----------
-	void Device::takePicture() {
-		//press shutter
-		{
-			CHECK_ERROR(EdsSendCommand(this->camera, kEdsCameraCommand_TakePicture, 0)
-				, "Take picture");
+	future<Device::PhotoCaptureResult> Device::takePhotoAsync() {
+		EdsError error = EDS_ERR_OK;
+
+		if (this->captureStatus == CaptureStatus::WaitingForPhotoDownload) {
+			//we're already capturing, return a failed capture future
+			error = EDS_ERR_DEVICE_BUSY;
 		}
+		else {
+			this->captureStatus = CaptureStatus::WaitingForPhotoDownload;
+
+			//press shutter
+			{
+				error = EdsSendCommand(this->camera, kEdsCameraCommand_TakePicture, 0);
+				if (error != EDS_ERR_OK) {
+					goto failNewCapture;
+				}
+			}
+
+			this->capturePromise = make_unique<promise<PhotoCaptureResult>>();
+			return this->capturePromise->get_future();
+
+		failNewCapture:
+			this->captureStatus = CaptureStatus::CaptureFailed;
+			goto fail;
+		}
+
 	fail:
-		return;
+		//return failed future
+		promise<PhotoCaptureResult> promiseWeCantKeep;
+		auto future = promiseWeCantKeep.get_future();
+		PhotoCaptureResult result = {
+			nullptr,
+			nullptr,
+			error
+		};
+		promiseWeCantKeep.set_value(result);
+		return future;
 	}
 
 	//----------
-	ofPixels Device::getPhoto() {
-		this->photoMutex.lock();
-		{
-			const auto & photo = this->photo;
-		}
-		this->photoMutex.unlock();
-		return photo;
+	Device::CaptureStatus Device::getCaptureStatus() const {
+		return this->captureStatus;
 	}
 
 	//----------
@@ -185,80 +213,139 @@ namespace ofxCanon {
 	}
 
 	//----------
+	void Device::performInCameraThreadBlocking(Action && action) {
+		if (this_thread::get_id() == this->cameraThreadId) {
+			action();
+		}
+		else {
+			while (true) {
+				{
+					unique_lock<mutex> lock(this->blockingActionMutex);
+					if (!this->blockingAction) {
+						//no blocking action waiting
+						this->blockingAction = action;
+						break;
+					}
+				}
+
+				//already have a blocking action waiting before this one
+				this_thread::sleep_for(chrono::milliseconds(10));
+			}
+
+			while (true) {
+				unique_lock<mutex> lock(this->blockingActionMutex);
+				if (!this->blockingAction) {
+					break;
+				}
+
+				//waiting for our blocking action to complete
+				this_thread::sleep_for(chrono::milliseconds(10));
+			}
+		}
+	}
+
+	//----------
 	void Device::download(EdsDirectoryItemRef directoryItem) {
-		EdsDirectoryItemInfo directoryItemInfo;
-		EdsStreamRef stream = NULL;
-		ofBuffer buffer;
+		PhotoCaptureResult photoCaptureAsyncResult;
+		try {
+			EdsDirectoryItemInfo directoryItemInfo;
+			EdsStreamRef encodedStream = NULL;
 
-		CHECK_ERROR(EdsGetDirectoryItemInfo(directoryItem, &directoryItemInfo)
-			, "Get directory item info");
+			THROW_ERROR(EdsGetDirectoryItemInfo(directoryItem, &directoryItemInfo)
+				, "Get directory item info");
 
-		//download image
-		{
-			CHECK_ERROR(EdsCreateMemoryStream(0, &stream)
-				, "Create memory stream");
-			CHECK_ERROR(EdsDownload(directoryItem, directoryItemInfo.size, stream)
-				, "Download directory item");
-			CHECK_ERROR(EdsDownloadComplete(directoryItem)
-				, "Download complete");
-			CHECK_ERROR(EdsDeleteDirectoryItem(directoryItem)
-				, "Delete directory item");
+			//download image
+			{
+				THROW_ERROR(EdsCreateMemoryStream(0, &encodedStream)
+					, "Create memory stream for encoded image");
+				THROW_ERROR(EdsDownload(directoryItem, directoryItemInfo.size, encodedStream)
+					, "Download directory item");
+				THROW_ERROR(EdsDownloadComplete(directoryItem)
+					, "Download complete");
+				THROW_ERROR(EdsDeleteDirectoryItem(directoryItem)
+					, "Delete directory item");
+			}
+
+			// NOTE : The Canon SDK does not provide decoding of RAW images for all its cameras, especially in 64bit
+			// Therefore we use freeimage to perform this function (i.e. openFrameworks' built in functions),
+			//	which do not offer functions such as getting the lens properties.
+
+			//decode stream
+			shared_ptr<ofBuffer> buffer;
+			{
+				EdsUInt64 streamLength;
+				THROW_ERROR(EdsGetLength(encodedStream, &streamLength)
+					, "Get encoded stream length (i.e. file size)");
+				char * encodedData = NULL;
+				THROW_ERROR(EdsGetPointer(encodedStream, (EdsVoid**)& encodedData)
+					, "Get pointer to encoded data");
+				buffer = make_shared<ofBuffer>(encodedData, streamLength);
+			}
+
+			//attempt to read metadata from the image reference
+			EdsImageRef imageRef = NULL;
+			shared_ptr<PhotoMetadata> metaData;
+			{
+				try {
+					THROW_ERROR(EdsCreateImageRef(encodedStream, &imageRef)
+						, "Create image reference from incoming stream for metadata purposes (Unsupported for CR2 on some camera models especially in x64)");
+					vector<EdsRational> value(3);
+					THROW_ERROR(EdsGetPropertyData(imageRef, kEdsPropID_FocalLength, 0, sizeof(EdsRational) * 3, value.data())
+						, "Get focal length data from image");
+					metaData = make_shared<PhotoMetadata>();
+					metaData->focalLength.minimumFocalLength = rationalToFloat(value[2]);
+					metaData->focalLength.currentFocalLength = rationalToFloat(value[0]);
+					metaData->focalLength.maximumFocalLength = rationalToFloat(value[1]);
+				}
+				catch (EdsError errorCode) {
+					//this generally happens when the image is RAW and the SDK can't process it
+				}
+			}
+
+			//release the objects
+			THROW_ERROR(EdsRelease(encodedStream)
+				, "Release encoded stream");
+
+			this->hasDownloadedFirstPhoto = true;
+			this->captureStatus = CaptureStatus::CaptureSucceeded;
+
+			//if we've got an async listener waiting for a photo
+			if (this->capturePromise) {
+				photoCaptureAsyncResult.errorReturned = EDS_ERR_OK;
+				photoCaptureAsyncResult.encodedBuffer = buffer;
+				photoCaptureAsyncResult.metaData = metaData;
+			}
+		}
+		catch (EdsError error) {
+			this->captureStatus = CaptureStatus::CaptureFailed;
+
+			//if we've got an async listener waiting for a photo
+			if (this->capturePromise) {
+				photoCaptureAsyncResult.errorReturned = error;
+			}
 		}
 
-		//get the image properties
- 		EdsImageRef imageRef;
- 		{
-// 			CHECK_ERROR(EdsCreateImageRef(stream, &imageRef)
-// 				, "Create image reference");
-// 
-// 			vector<EdsRational> value(3);
-// 			CHECK_ERROR(EdsGetPropertyData(imageRef, kEdsPropID_FocalLength, 0, sizeof(EdsRational) * 3, value.data())
-// 				, "Get focal length data");
-// 			this->lensInfo.minimumFocalLength = rationalToFloat(value[2]);
-// 			this->lensInfo.currentFocalLength = rationalToFloat(value[0]);
-// 			this->lensInfo.maximumFocalLength = rationalToFloat(value[1]);
- 		}
-
-		//copy to buffer
-		{
-			size_t length;
-			CHECK_ERROR(EdsGetLength(stream, &length)
-				, "Set stream length");
-			char * data;
-			CHECK_ERROR(EdsGetPointer(stream, (EdsVoid**)& data)
-				, "Get stream pointer");
-			buffer.set(data, length);
-		}
-
-		//decode buffer
-		{
-			ofBufferToFile("output.jpeg", buffer);
-			ofLoadImage(this->photo, buffer);
-		}
-
-		//release the stream
-		CHECK_ERROR(EdsRelease(stream)
-			, "Release stream");
-
-	fail:
-		return;
+		this->capturePromise->set_value(photoCaptureAsyncResult);
+		this->capturePromise.reset();
 	}
 
 	//----------
 	void Device::lensChanged() {
 		auto lensStatus = this->getProperty<EdsUInt32>(kEdsPropID_LensStatus);
 		
-		LensInfo lensInfo;
 		if (lensStatus == 0) {
-			//lens detached
+			//no lens present
+			if (this->lensInfo.lensAttached) {
+				//lens removed
+				this->lensInfo = LensInfo();
+				this->onLensChange.notify(this->lensInfo);
+			}
 		}
 		else {
-			//lens attached
-			lensInfo.lensAttached = true;
+			//lens present
+			this->lensInfo.lensAttached = true;
+			this->onLensChange.notify(this->lensInfo);
 		}
-
-		this->lensInfo = lensInfo;
-		this->onLensChange.notify(this->lensInfo);
 	}
 
 	//----------
@@ -462,35 +549,14 @@ namespace ofxCanon {
 	}
 
 	//----------
-	template<typename DataType>
-	DataType Device::getProperty(EdsPropertyID propertyID) {
-		DataType value;
-		CHECK_ERROR(EdsGetPropertyData(this->camera, propertyID, 0, sizeof(DataType), &value)
-			, "Get property : " + propertyToString(propertyID));
-	fail:
-		return value;
+	bool Device::getLogDeviceCallbacks() const {
+		return this->logDeviceCallbacks;
 	}
 
 	//----------
-	template<typename DataType>
-	vector<DataType> Device::getPropertyArray(EdsPropertyID propertyID, size_t size) {
-		vector<DataType> value(size);
-		CHECK_ERROR(EdsGetPropertyData(this->camera, propertyID, 0, (EdsUInt32) (sizeof(DataType) * size), value.data())
-			, "Get property array : " + propertyToString(propertyID));
-	fail:
-		return value;
+	void Device::setLogDeviceCallbacks(bool logDeviceCallbacks) {
+		this->logDeviceCallbacks = logDeviceCallbacks;
 	}
-
-	//----------
-	template<typename DataType>
-	bool Device::setProperty(EdsPropertyID propertyID, DataType value) {
-		CHECK_ERROR(EdsSetPropertyData(this->camera, propertyID, 0, sizeof(DataType), &value)
-			, "Set property : " + propertyToString(propertyID));
-		return true;
-	fail:
-		return false;
-	}
-
 
 	//----------
 	//Referenced from CameraControl.cpp in sample of v0304W of EDSDK

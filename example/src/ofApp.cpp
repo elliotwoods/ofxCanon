@@ -6,8 +6,8 @@ void ofApp::setup() {
 
 	for (auto device : devices) {
 		device->open();
-		device->takePicture();
 		this->device = device;
+		this->keyPressed(' '); //take photo
 		break;
 	}
 }
@@ -17,13 +17,6 @@ void ofApp::update(){
 	if (!device) {
 		return;
 	}
-
-	this->device->idleFunction();
-
-	auto & pixels = this->device->getPhoto();
-	if (pixels.isAllocated()) {
-		this->preview.loadData(pixels);
-	}	
 }
 
 //--------------------------------------------------------------
@@ -55,9 +48,6 @@ void ofApp::draw(){
 			auto lensInfo = this->device->getLensInfo();
 			if (lensInfo.lensAttached) {
 				status << "Lens : " << lensInfo.lensName << endl;
-				status << "Current focal length : " << lensInfo.currentFocalLength << endl;
-				status << "Minimum focal length : " << lensInfo.minimumFocalLength << endl;
-				status << "Maximum focal length : " << lensInfo.maximumFocalLength << endl;
 			}
 			else {
 				status << "No lens attached" << endl;
@@ -87,8 +77,14 @@ void ofApp::keyPressed(int key){
 
 	switch (key) {
 	case ' ':
-		this->device->takePicture();
+	{
+		ofPixels pixels;
+		if (this->device->takePhoto(pixels)) {
+			this->preview.loadData(pixels);
+		}
 		break;
+	}
+
 	case 'i':
 	case 'I':
 	{

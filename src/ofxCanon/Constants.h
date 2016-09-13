@@ -4,7 +4,21 @@
 #include <string>
 #include <map>
 
+#define CHECK_ERROR(ERRORCODE, ACTIONNAME) \
+if(ERRORCODE != EDS_ERR_OK) { \
+	logError(ACTIONNAME, ERRORCODE); \
+	goto fail; \
+}
+
+#define THROW_ERROR(ERRORCODE, ACTIONNAME) \
+if(ERRORCODE != EDS_ERR_OK) { \
+	logError(ACTIONNAME, ERRORCODE); \
+	throw(ERRORCODE); \
+}
+
 namespace ofxCanon {
+	void logError(const std::string & actionName, EdsUInt32 errorCode);
+
 	std::string errorToString(EdsError);
 	std::string propertyToString(EdsPropertyID);
 	std::string cameraCommandToString(EdsCameraCommand);
