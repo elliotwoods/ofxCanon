@@ -17,11 +17,10 @@ void ofApp::setup() {
 
 //--------------------------------------------------------------
 void ofApp::update(){
-	if (!device) {
-		return;
+	if (device) {
+		device->update();
 	}
 
-	this->device->idleFunction();
 
 }
 

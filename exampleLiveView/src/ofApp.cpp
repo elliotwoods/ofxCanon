@@ -17,18 +17,16 @@ void ofApp::setup() {
 
 //--------------------------------------------------------------
 void ofApp::update(){
-	if (!device) {
-		return;
-	}
+	if (device) {
+		device->update();
 
-	device->idleFunction();
-
-	//update live view
-	{
-		ofPixels liveViewPixels;
-		if (this->device->getLiveView(liveViewPixels)) {
-			this->previewLiveView.loadData(liveViewPixels);
-			this->isLivePixelsNew = true;
+		//update live view
+		{
+			ofPixels liveViewPixels;
+			if (this->device->getLiveView(liveViewPixels)) {
+				this->previewLiveView.loadData(liveViewPixels);
+				this->isLivePixelsNew = true;
+			}
 		}
 	}
 }

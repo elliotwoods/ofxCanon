@@ -92,7 +92,7 @@ namespace ofxCanon {
 					}
 
 					//perform outstanding actions
-					this->cameraThread->device->idleFunction();
+					this->cameraThread->device->update();
 
 					//grab live view frame
 					if (this->useLiveView) {

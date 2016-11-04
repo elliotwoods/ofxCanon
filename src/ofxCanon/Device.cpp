@@ -102,7 +102,7 @@ namespace ofxCanon {
 	}
 
 	//----------
-	void Device::idleFunction() {
+	void Device::update() {
 		//perform any immediate blocking action
 		{
 			unique_lock<mutex> lock(this->blockingActionMutex);

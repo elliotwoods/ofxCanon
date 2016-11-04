@@ -83,7 +83,7 @@ namespace ofxCanon {
 
 			bool open();
 			void close();
-			void idleFunction();
+			void update();
 
 			future<PhotoCaptureResult> takePhotoAsync();
 
@@ -94,7 +94,7 @@ namespace ofxCanon {
 				auto future = this->takePhotoAsync();
 				while (future.wait_for(chrono::milliseconds(10)) != future_status::ready) {
 					glfwPollEvents();
-					this->idleFunction();
+					this->update();
 				}
 
 				auto result = future.get();

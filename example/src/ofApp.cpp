@@ -14,8 +14,8 @@ void ofApp::setup() {
 
 //--------------------------------------------------------------
 void ofApp::update(){
-	if (!device) {
-		return;
+	if (this->device) {
+		this->device->update();
 	}
 }
 
@@ -28,32 +28,11 @@ void ofApp::draw(){
 	if(this->device) {
 		stringstream status;
 
-		{
-			auto deviceInfo = this->device->getDeviceInfo();
-			status << "Camera : " << deviceInfo.description << endl;
-			status << "Port : " << deviceInfo.port << endl;
-			status << endl;
-			status << "Manufacturer : " << deviceInfo.owner.manufacturer << endl;
-			status << "Owner : " << deviceInfo.owner.owner << endl;
-			status << "Artist : " << deviceInfo.owner.artist << endl;
-			status << "Copyright : " << deviceInfo.owner.copyright << endl;
-			status << endl;
-			status << "Battery level : " << deviceInfo.battery.batteryLevel << endl;
-			status << "Battery quality : " << deviceInfo.battery.batteryQuality << endl;
-			status << "PSU present : " << deviceInfo.battery.psuPresent << endl;
-			status << endl;
-		}
+		status << this->device->getDeviceInfo().toString();
+		status << endl;
 
-		{
-			auto lensInfo = this->device->getLensInfo();
-			if (lensInfo.lensAttached) {
-				status << "Lens : " << lensInfo.lensName << endl;
-			}
-			else {
-				status << "No lens attached" << endl;
-			}
-			status << endl;
-		}
+		status << this->device->getLensInfo().toString();
+		status << endl;
 
 		{
 			status << "[I]SO : \t\t" << device->getISO() << endl;
