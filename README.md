@@ -26,8 +26,8 @@ This addon is tested with:
 
 | IDE / Platform | EDSDK v. | Camera  | Machine  | Success | Commit  |
 |----------------|----------|---------|----------|---------|---------|
-| VS2015         | 3.5.0    | EOS100D | x86, x64 | YES     | 53bd045 |
-| VS2015         | 3.5.0    | EOS550D | x86, x64 | YES     | 53bd045 |
+| VS2015         | 3.5.0    | EOS100D | x86, x64 | YES     | [1689bf3](https://github.com/elliotwoods/ofxCanon/commit/1689bf3bebd186a3365fe7052c3ccb0f54b0ede8) |
+| VS2015         | 3.5.0    | EOS550D | x86, x64 | YES     | [1689bf3](https://github.com/elliotwoods/ofxCanon/commit/1689bf3bebd186a3365fe7052c3ccb0f54b0ede8) |
 
 ## ofxEdsdk compatability 
 
