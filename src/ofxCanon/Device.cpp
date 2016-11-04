@@ -58,7 +58,6 @@ namespace ofxCanon {
 		this->close();
 
 		this->cameraThreadId = std::this_thread::get_id();
-		CoInitializeEx(NULL, 0x0);
 
 		ERROR_GOTO_FAIL(EdsOpenSession(this->camera)
 			, "Open session");
@@ -395,13 +394,13 @@ namespace ofxCanon {
 			if (this->lensInfo.lensAttached) {
 				//lens removed
 				this->lensInfo = LensInfo();
-				this->onLensChange.notify(this->lensInfo);
+				this->onLensChange.notify(this, this->lensInfo);
 			}
 		}
 		else {
 			//lens present
 			this->lensInfo.lensAttached = true;
-			this->onLensChange.notify(this->lensInfo);
+			this->onLensChange.notify(this, this->lensInfo);
 		}
 	}
 

@@ -3,7 +3,7 @@
 #include "ofLog.h"
 
 #include <memory>
-#include "EDSDK.h"
+#include "EDSDK_include.h"
 
 namespace ofxCanon {
 	//----------

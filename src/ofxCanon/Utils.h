@@ -1,8 +1,8 @@
 #pragma once
 
-#include "EDSDK.h"
-
 #include "ofFileUtils.h"
+
+#include "EDSDK_include.h"
 
 #include <string>
 #include <map>

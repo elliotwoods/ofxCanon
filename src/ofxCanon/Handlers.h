@@ -1,6 +1,6 @@
 #pragma once
 
-#include "EDSDK.h"
+#include "EDSDK_include.h"
 
 namespace ofxCanon {
 	// Handlers are callbacks fired through glfwPollEvents (i.e. the EOS SDK fires these events via the OS handle callback system)

@@ -3,7 +3,6 @@
 #include "Utils.h"
 #include "Handlers.h"
 #include "ofMain.h"
-#include "EDSDK.h"
 
 #include <future>
 
