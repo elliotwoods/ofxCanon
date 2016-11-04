@@ -7,7 +7,7 @@ An openFrameworks addon for interfacing with Canon DSLR cameras.
 ## Features
 
 * Photo taking
-  * Blocking of Async (using C++11 `std::future`)
+  * Blocking or Async (using C++11 `std::future`)
   * 8bit and 16bit
 * ISO / Aperture / Shutter speed settings (+ ofParameter support)
 * Lens information (+ events when lens is changed)
