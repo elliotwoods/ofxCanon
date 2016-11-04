@@ -24,10 +24,16 @@ With Visual Studio you can optionally use the [ofxAddonLib](http://github.com/el
 
 This addon is tested with:
 
-| IDE / Platform | EDSDK v. | Camera  | Machine  | Success | Commit  |
-|----------------|----------|---------|----------|---------|---------|
-| VS2015         | 3.5.0    | EOS100D | x86, x64 | YES     | [1689bf3](https://github.com/elliotwoods/ofxCanon/commit/1689bf3bebd186a3365fe7052c3ccb0f54b0ede8) |
-| VS2015         | 3.5.0    | EOS550D | x86, x64 | YES     | [1689bf3](https://github.com/elliotwoods/ofxCanon/commit/1689bf3bebd186a3365fe7052c3ccb0f54b0ede8) |
+### 2016.11.04
+
+Commit #[6b1b18b](https://github.com/elliotwoods/ofxCanon/commit/6b1b18b3edada5cfd52796f748429901da5eeb4d)
+
+| IDE / Platform | EDSDK v. | Camera  | Machine  | Success | 
+|----------------|----------|---------|----------|---------|
+| VS2015         | 3.5.0    | EOS100D | x86, x64 | YES     |
+| VS2015         | 3.5.0    | EOS550D | x86, x64 | YES     |
+| XCode          | 3.5.0    | EOS100D | x86, x64 | YES     |
+| XCode          | 3.5.0    | EOS550D | x86, x64 | YES     |
 
 ## Setup
 
