@@ -11,7 +11,11 @@ An openFrameworks addon for interfacing with Canon DSLR cameras.
   * 8bit and 16bit
 * ISO / Aperture / Shutter speed settings (+ ofParameter support)
 * Lens information (+ events when lens is changed)
-* Stricter threading model (including utilities to call functions in the right thread)
+* Stricter threading model
+    * Ability to call functions in different threads 'remotely'
+    * `std::future` for async capture
+    * Use it directly with your own threads, or use the `Simple` class to manage threads for you
+* Backwards compatability with `ofxEdsdk::Camera`
 
 ## Requirements
 
