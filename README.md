@@ -20,6 +20,15 @@ An openFrameworks addon for interfacing with Canon DSLR cameras.
 
 With Visual Studio you can optionally use the [ofxAddonLib](http://github.com/elliotwoods/ofxAddonLib] pattern. Please refer to the ofxAddonLib [Readme.md](https://github.com/elliotwoods/ofxAddonLib/blob/master/Readme.md) for notes on how to get this setup.
 
+## Tested
+
+This addon is tested with:
+
+|IDE/Platform|EDSDK v|Camera|Machine|Success|
+|-|-|-|-|-|
+|VS2015|3.5.0|100D|x86,x64|YES|
+|VS2015|3.5.0|550D|x86,x64|YES|
+
 ## ofxEdsdk compatability 
 
 This addon carries on from [ofxEdsdk](https://github.com/kylemcdonald/ofxEdsdk) adding some features (although some may be missing).
