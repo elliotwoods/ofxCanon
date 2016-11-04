@@ -60,4 +60,4 @@ This addon carries on from [ofxEdsdk](https://github.com/kylemcdonald/ofxEdsdk) 
 
 Compatability with ofxEdsdk is provided by the `ofxCanon::Simple` class which has the same interface as `ofxEdsdk::Camera` (i.e. all the method names are the same and it should act as a drop-in replacement if you need it).
 
-Some users of ofxEdsdk (myself included) have experienced issues with ofxEdsdk, and this addon is intended as a way to circumvent those issues. If ofxEdsdk works well for you, then I'd suggest you stick with it.
+Some users of ofxEdsdk (myself included) have experienced issues with ofxEdsdk, and this addon is intended as a way to circumvent those issues. However, if ofxEdsdk is working well for you, then great! I'd suggest to stick with it and come back if you encounter an issue :).
