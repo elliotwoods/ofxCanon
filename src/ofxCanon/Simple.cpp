@@ -1,6 +1,10 @@
 #include "Simple.h"
 #include "Initializer.h"
 
+#ifdef TARGET_WIN32
+	#include "combaseapi.h"
+#endif
+
 namespace ofxCanon {
 
 	//----------
