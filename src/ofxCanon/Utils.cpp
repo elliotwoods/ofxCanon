@@ -1,5 +1,7 @@
-#include "Constants.h"
+#include "Utils.h"
 #include "ofLog.h"
+
+#include <chrono>
 
 using namespace std;
 
@@ -8,6 +10,11 @@ namespace ofxCanon {
 	//----------
 	void logError(const string & actionName, EdsUInt32 errorCode) {
 		ofLogError("ofxCanon") << actionName << " failed with error " << errorToString(errorCode);
+	}
+
+	//----------
+	void logWarning(const std::string & actionName, EdsUInt32 errorCode) {
+		ofLogWarning("ofxCanon") << actionName << " failed with error " << errorToString(errorCode);
 	}
 
 	//----------
@@ -566,4 +573,42 @@ namespace ofxCanon {
 		return (float)rational.numerator / (float)rational.denominator;
 	}
 
+	//----------
+	shared_ptr<ofBuffer> getBuffer(EdsStreamRef stream) {
+		shared_ptr<ofBuffer> buffer;
+
+		EdsUInt64 streamLength;
+		ERROR_THROW(EdsGetLength(stream, &streamLength)
+			, "Get encoded stream length (i.e. file size)");
+		char * encodedData = NULL;
+		ERROR_THROW(EdsGetPointer(stream, (EdsVoid**)& encodedData)
+			, "Get pointer to encoded data");
+		return make_shared<ofBuffer>(encodedData, streamLength);
+	}
+
+#pragma mark FramerateCounter
+	//----------
+	void FramerateCounter::update() {
+		unique_lock<mutex> lock(this->frameTimesMutex);
+		if (!this->frameTimes.empty()) {
+			auto now = chrono::high_resolution_clock::now();
+			auto old = this->frameTimes.front();
+			auto size = this->frameTimes.size();
+			while (this->frameTimes.size() > 30) {
+				this->frameTimes.pop();
+			}
+			this->frameRate = (double)(size - 1) * 1e6 / (double)chrono::duration_cast<chrono::microseconds>(now - old).count();
+		}
+	}
+
+	//----------
+	void FramerateCounter::addFrame(chrono::high_resolution_clock::time_point timePoint) {
+		unique_lock<mutex> lock(this->frameTimesMutex);
+		this->frameTimes.push(timePoint);
+	}
+
+	//----------
+	float FramerateCounter::getFrameRate() const {
+		return this->frameRate;
+	}
 }

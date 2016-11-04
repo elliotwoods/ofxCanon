@@ -12,17 +12,17 @@ namespace ofxCanon {
 		else {
 			{
 				EdsDeviceInfo deviceInfo;
-				CHECK_ERROR(EdsGetDeviceInfo(camera, &deviceInfo)
+				ERROR_GOTO_FAIL(EdsGetDeviceInfo(camera, &deviceInfo)
 					, "Get device info");
 				this->deviceInfo.description = string(deviceInfo.szDeviceDescription);
 				this->deviceInfo.port = string(deviceInfo.szPortName);
 			}
 
-			CHECK_ERROR(EdsSetPropertyEventHandler(camera, kEdsPropertyEvent_All, Handlers::handlePropertyEvent, (EdsVoid *) this)
+			ERROR_GOTO_FAIL(EdsSetPropertyEventHandler(camera, kEdsPropertyEvent_All, Handlers::handlePropertyEvent, (EdsVoid *) this)
 				, "Set property event handler");
-			CHECK_ERROR(EdsSetObjectEventHandler(camera, kEdsObjectEvent_All, Handlers::handleObjectEvent, (EdsVoid *) this)
+			ERROR_GOTO_FAIL(EdsSetObjectEventHandler(camera, kEdsObjectEvent_All, Handlers::handleObjectEvent, (EdsVoid *) this)
 				, "Set object event handler");
-			CHECK_ERROR(EdsSetCameraStateEventHandler(camera, kEdsStateEvent_All, Handlers::handleStateEvent, (EdsVoid *) this)
+			ERROR_GOTO_FAIL(EdsSetCameraStateEventHandler(camera, kEdsStateEvent_All, Handlers::handleStateEvent, (EdsVoid *) this)
 				, "Set state event handler");
 		}
 
@@ -58,30 +58,31 @@ namespace ofxCanon {
 		this->close();
 
 		this->cameraThreadId = std::this_thread::get_id();
+		CoInitializeEx(NULL, 0x0);
 
-		CHECK_ERROR(EdsOpenSession(this->camera)
+		ERROR_GOTO_FAIL(EdsOpenSession(this->camera)
 			, "Open session");
 
 		//Set the save-to location to host
 		{
 			EdsUInt32 saveTo = kEdsSaveTo_Host;
-			CHECK_ERROR(EdsSetPropertyData(this->camera, kEdsPropID_SaveTo, 0, sizeof(saveTo), &saveTo)
+			ERROR_GOTO_FAIL(EdsSetPropertyData(this->camera, kEdsPropID_SaveTo, 0, sizeof(saveTo), &saveTo)
 				, "Set save to host");
 		}
 
 		//Temporarily lock the UI
-		CHECK_ERROR(EdsSendStatusCommand(this->camera, kEdsCameraStatusCommand_UILock, 0)
+		ERROR_GOTO_FAIL(EdsSendStatusCommand(this->camera, kEdsCameraStatusCommand_UILock, 0)
 			, "Lock the camera UI");
 
 		//Tell the camera that there's plenty of capacity available on the host (used to display shots remaining)
 		{
 			EdsCapacity capacity = { 0x7FFFFFFF, 0x1000, 1 };
-			CHECK_ERROR(EdsSetCapacity(this->camera, capacity)
+			ERROR_GOTO_FAIL(EdsSetCapacity(this->camera, capacity)
 				, "Notify the camera of available storage on host device");
 		}
 
 		//Unlock the camera UI
-		CHECK_ERROR(EdsSendStatusCommand(this->camera, kEdsCameraStatusCommand_UIUnLock, 0)
+		ERROR_GOTO_FAIL(EdsSendStatusCommand(this->camera, kEdsCameraStatusCommand_UIUnLock, 0)
 			, "Unlock the camera UI");
 
 		this->isOpen = true;
@@ -94,7 +95,7 @@ namespace ofxCanon {
 	//----------
 	void Device::close() {
 		if (this->isOpen) {
-			CHECK_ERROR(EdsCloseSession(this->camera)
+			ERROR_GOTO_FAIL(EdsCloseSession(this->camera)
 				, "Close session");
 		}
 	fail:
@@ -120,7 +121,6 @@ namespace ofxCanon {
 				actionQueue.pop();
 			}
 		}
-	 
 	}
 
 	//----------
@@ -164,6 +164,50 @@ namespace ofxCanon {
 	}
 
 	//----------
+	bool Device::getLiveView(ofPixels & pixels) const {
+		try {
+			if (!this->liveViewEnabled) {
+				ofLogError("ofxCanon") << "Cannot call getLiveView. Please call setLiveViewEnabled(true).";
+				throw((EdsError)0);
+			}
+
+			EdsStreamRef encodedStream = NULL;
+			ERROR_THROW(EdsCreateMemoryStream(0, &encodedStream)
+				, "Create memory stream for encoded live view image");
+
+			EdsEvfImageRef evfImage = NULL;
+			ERROR_THROW(EdsCreateEvfImageRef(encodedStream, &evfImage)
+				, "Create EVF iamge reference");
+
+			{
+				auto result = EdsDownloadEvfImage(this->camera, evfImage);
+				if (result == EDS_ERR_OBJECT_NOTREADY) {
+					return false;
+				}
+				else {
+					ERROR_THROW(result
+						, "Download live view image");
+				}
+			}
+
+			auto buffer = getBuffer(encodedStream);
+			
+			ofLoadImage(pixels, * buffer);
+
+			ERROR_THROW(EdsRelease(encodedStream)
+				, "Release live view stream");
+			ERROR_THROW(EdsRelease(evfImage)
+				, "Release live view image");
+
+			return true;
+		}
+		catch (EdsError) {
+			ofLogError("ofxCanon") << "Poll live view failed";
+			return false;
+		}
+	}
+
+	//----------
 	Device::CaptureStatus Device::getCaptureStatus() const {
 		return this->captureStatus;
 	}
@@ -197,6 +241,16 @@ namespace ofxCanon {
 		}
 
 		return optionsStrings;
+	}
+	
+	//----------
+	bool Device::getLogDeviceCallbacks() const {
+		return this->logDeviceCallbacks;
+	}
+
+	//----------
+	void Device::setLogDeviceCallbacks(bool logDeviceCallbacks) {
+		this->logDeviceCallbacks = logDeviceCallbacks;
 	}
 
 	//----------
@@ -246,23 +300,33 @@ namespace ofxCanon {
 
 	//----------
 	void Device::download(EdsDirectoryItemRef directoryItem) {
+		if (!this->capturePromise) {
+			// no photo taking is taking place (e.g. we're downloading something which we didn't ask to capture)
+			// so we just clean up
+
+			WARNING(EdsRelease(directoryItem)
+				, "Release directory item");
+
+			return;
+		}
+
 		PhotoCaptureResult photoCaptureAsyncResult;
 		try {
 			EdsDirectoryItemInfo directoryItemInfo;
 			EdsStreamRef encodedStream = NULL;
 
-			THROW_ERROR(EdsGetDirectoryItemInfo(directoryItem, &directoryItemInfo)
+			ERROR_THROW(EdsGetDirectoryItemInfo(directoryItem, &directoryItemInfo)
 				, "Get directory item info");
 
 			//download image
 			{
-				THROW_ERROR(EdsCreateMemoryStream(0, &encodedStream)
+				ERROR_THROW(EdsCreateMemoryStream(0, &encodedStream)
 					, "Create memory stream for encoded image");
-				THROW_ERROR(EdsDownload(directoryItem, directoryItemInfo.size, encodedStream)
+				ERROR_THROW(EdsDownload(directoryItem, directoryItemInfo.size, encodedStream)
 					, "Download directory item");
-				THROW_ERROR(EdsDownloadComplete(directoryItem)
+				ERROR_THROW(EdsDownloadComplete(directoryItem)
 					, "Download complete");
-				THROW_ERROR(EdsDeleteDirectoryItem(directoryItem)
+				WARNING(EdsDeleteDirectoryItem(directoryItem)
 					, "Delete directory item");
 			}
 
@@ -270,40 +334,33 @@ namespace ofxCanon {
 			// Therefore we use freeimage to perform this function (i.e. openFrameworks' built in functions),
 			//	which do not offer functions such as getting the lens properties.
 
-			//decode stream
-			shared_ptr<ofBuffer> buffer;
-			{
-				EdsUInt64 streamLength;
-				THROW_ERROR(EdsGetLength(encodedStream, &streamLength)
-					, "Get encoded stream length (i.e. file size)");
-				char * encodedData = NULL;
-				THROW_ERROR(EdsGetPointer(encodedStream, (EdsVoid**)& encodedData)
-					, "Get pointer to encoded data");
-				buffer = make_shared<ofBuffer>(encodedData, streamLength);
-			}
+			auto buffer = getBuffer(encodedStream);
 
 			//attempt to read metadata from the image reference
 			EdsImageRef imageRef = NULL;
 			shared_ptr<PhotoMetadata> metaData;
 			{
 				try {
-					THROW_ERROR(EdsCreateImageRef(encodedStream, &imageRef)
+					ERROR_THROW(EdsCreateImageRef(encodedStream, &imageRef)
 						, "Create image reference from incoming stream for metadata purposes (Unsupported for CR2 on some camera models especially in x64)");
 					vector<EdsRational> value(3);
-					THROW_ERROR(EdsGetPropertyData(imageRef, kEdsPropID_FocalLength, 0, sizeof(EdsRational) * 3, value.data())
+					ERROR_THROW(EdsGetPropertyData(imageRef, kEdsPropID_FocalLength, 0, sizeof(EdsRational) * 3, value.data())
 						, "Get focal length data from image");
 					metaData = make_shared<PhotoMetadata>();
 					metaData->focalLength.minimumFocalLength = rationalToFloat(value[2]);
 					metaData->focalLength.currentFocalLength = rationalToFloat(value[0]);
 					metaData->focalLength.maximumFocalLength = rationalToFloat(value[1]);
+
+					ERROR_THROW(EdsRelease(imageRef)
+						, "Release downloaded image");
 				}
-				catch (EdsError errorCode) {
+				catch (EdsError) {
 					//this generally happens when the image is RAW and the SDK can't process it
 				}
 			}
 
 			//release the objects
-			THROW_ERROR(EdsRelease(encodedStream)
+			ERROR_THROW(EdsRelease(encodedStream)
 				, "Release encoded stream");
 
 			this->hasDownloadedFirstPhoto = true;
@@ -359,6 +416,16 @@ namespace ofxCanon {
 	//----------
 	void Device::pollProperty(EdsPropertyID propertyID) {
 		switch (propertyID) {
+		case kEdsPropID_Evf_OutputDevice:
+		{
+			auto encoded = this->getProperty<EdsUInt32>(kEdsPropID_Evf_OutputDevice);
+			if (encoded & kEdsEvfOutputDevice_PC) {
+				this->liveViewEnabled = true;
+			}
+			else {
+				this->liveViewEnabled = false;
+			}
+		}
 		case kEdsPropID_ISOSpeed:
 		{
 			auto encoded = this->getProperty<EdsUInt32>(kEdsPropID_ISOSpeed);
@@ -473,7 +540,7 @@ namespace ofxCanon {
 
 		EdsPropertyDesc propertyDescription;
 
-		CHECK_ERROR(EdsGetPropertyDesc(this->camera, kEdsPropID_ISOSpeed, &propertyDescription)
+		ERROR_GOTO_FAIL(EdsGetPropertyDesc(this->camera, kEdsPropID_ISOSpeed, &propertyDescription)
 			, "Get property description");
 
 		for (int i = 0; i < propertyDescription.numElements; i++) {
@@ -490,7 +557,7 @@ namespace ofxCanon {
 
 		EdsPropertyDesc propertyDescription;
 
-		CHECK_ERROR(EdsGetPropertyDesc(this->camera, kEdsPropID_Av, &propertyDescription)
+		ERROR_GOTO_FAIL(EdsGetPropertyDesc(this->camera, kEdsPropID_Av, &propertyDescription)
 			, "Get property description");
 
 		for (int i = 0; i < propertyDescription.numElements; i++) {
@@ -507,7 +574,7 @@ namespace ofxCanon {
 
 		EdsPropertyDesc propertyDescription;
 
-		CHECK_ERROR(EdsGetPropertyDesc(this->camera, kEdsPropID_Tv, &propertyDescription)
+		ERROR_GOTO_FAIL(EdsGetPropertyDesc(this->camera, kEdsPropID_Tv, &propertyDescription)
 			, "Get property description");
 
 		for (int i = 0; i < propertyDescription.numElements; i++) {
@@ -549,13 +616,25 @@ namespace ofxCanon {
 	}
 
 	//----------
-	bool Device::getLogDeviceCallbacks() const {
-		return this->logDeviceCallbacks;
+	bool Device::getLiveViewEnabled() const {
+		return this->liveViewEnabled;
 	}
 
 	//----------
-	void Device::setLogDeviceCallbacks(bool logDeviceCallbacks) {
-		this->logDeviceCallbacks = logDeviceCallbacks;
+	void Device::setLiveViewEnabled(bool liveViewEnabled, bool enableCameraScreen) {
+		{
+			EdsUInt32 evfMode = liveViewEnabled ? 1 : 0;
+			this->setProperty(kEdsPropID_Evf_Mode, evfMode);
+		}
+
+		this->liveViewEnabled = liveViewEnabled;
+
+		if (liveViewEnabled) {
+			EdsUInt32 outputDevice = liveViewEnabled
+				? kEdsEvfOutputDevice_PC | (enableCameraScreen ? kEdsEvfOutputDevice_TFT : 0) // live view enabled
+				: 0; // live view disabled
+			this->setProperty(kEdsPropID_Evf_OutputDevice, outputDevice);
+		}
 	}
 
 	//----------
@@ -567,17 +646,17 @@ namespace ofxCanon {
 		ofxCanon::Initializer::X();
 
 		EdsCameraListRef cameraList;
-		CHECK_ERROR(EdsGetCameraList(&cameraList)
+		ERROR_GOTO_FAIL(EdsGetCameraList(&cameraList)
 			, "Get camera list");
 
 		EdsUInt32 cameraCount;
-		CHECK_ERROR(EdsGetChildCount(cameraList, &cameraCount)
+		ERROR_GOTO_FAIL(EdsGetChildCount(cameraList, &cameraCount)
 			, "Get camera count");
 
 		
 		for (int i = 0; i < cameraCount; i++) {
 			EdsCameraRef camera;
-			CHECK_ERROR(EdsGetChildAtIndex(cameraList, 0, &camera)
+			ERROR_GOTO_FAIL(EdsGetChildAtIndex(cameraList, 0, &camera)
 				, "Get the camera device");
 
 			if (camera != NULL) {
@@ -588,4 +667,39 @@ namespace ofxCanon {
 	fail:
 		return devices;
 	}
+
+	//----------
+	std::string Device::DeviceInfo::toString() const {
+		stringstream status;
+
+		status << "Camera : " << this->description << endl;
+		status << "Port : " << this->port << endl;
+		status << endl;
+		status << "Manufacturer : " << this->owner.manufacturer << endl;
+		status << "Owner : " << this->owner.owner << endl;
+		status << "Artist : " << this->owner.artist << endl;
+		status << "Copyright : " << this->owner.copyright << endl;
+		status << endl;
+		status << "Battery level : " << this->battery.batteryLevel << endl;
+		status << "Battery quality : " << this->battery.batteryQuality << endl;
+		status << "PSU present : " << this->battery.psuPresent << endl;
+		status << endl;
+
+		return status.str();
+	}
+
+	//----------
+	std::string Device::LensInfo::toString() const {
+		stringstream status;
+
+		if (this->lensAttached) {
+			status << "Lens : " << this->lensName << endl;
+		}
+		else {
+			status << "No lens attached" << endl;
+		}
+
+		return status.str();
+	}
+
 }

@@ -27,9 +27,6 @@
     <ClInclude Include="..\src\ofxCanon\Initializer.h">
       <Filter>src\ofxCanon</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\ofxCanon\Constants.h">
-      <Filter>src\ofxCanon</Filter>
-    </ClInclude>
     <ClInclude Include="..\libs\EDSDK\include\EDSDK.h">
       <Filter>libs\EDSDK\include</Filter>
     </ClInclude>
@@ -42,6 +39,12 @@
     <ClInclude Include="..\src\ofxCanon\Handlers.h">
       <Filter>src\ofxCanon</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\ofxCanon\Utils.h">
+      <Filter>src\ofxCanon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxCanon\Simple.h">
+      <Filter>src\ofxCanon</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\ofxCanon\Device.cpp">
@@ -50,10 +53,13 @@
     <ClCompile Include="..\src\ofxCanon\Initializer.cpp">
       <Filter>src\ofxCanon</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\ofxCanon\Constants.cpp">
+    <ClCompile Include="..\src\ofxCanon\Handlers.cpp">
       <Filter>src\ofxCanon</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\ofxCanon\Handlers.cpp">
+    <ClCompile Include="..\src\ofxCanon\Utils.cpp">
+      <Filter>src\ofxCanon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxCanon\Simple.cpp">
       <Filter>src\ofxCanon</Filter>
     </ClCompile>
   </ItemGroup>

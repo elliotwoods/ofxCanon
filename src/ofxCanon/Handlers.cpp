@@ -1,6 +1,6 @@
 #include "Handlers.h"
 #include "Device.h"
-#include "Constants.h"
+#include "Utils.h"
 
 namespace ofxCanon {
 	//----------
@@ -35,7 +35,7 @@ namespace ofxCanon {
 	//----------
 	EdsError EDSCALLBACK Handlers::handlePropertyEvent(EdsPropertyEvent eventType, EdsPropertyID propertyId, EdsUInt32 param, EdsVoid* context) {
 		auto device = static_cast<ofxCanon::Device*>(context);
-
+		
 		switch (eventType) {
 		case kEdsPropertyEvent_All:
 			device->performInCameraThread([=]() {

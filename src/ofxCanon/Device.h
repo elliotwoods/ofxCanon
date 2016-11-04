@@ -1,17 +1,11 @@
 #pragma once
 
-#include "Constants.h"
+#include "Utils.h"
 #include "Handlers.h"
 #include "ofMain.h"
 #include "EDSDK.h"
 
 #include <future>
-
-#ifndef PARAM_DECLARE
-	// Syntactic sugar which enables struct-ofParameterGroup
-	#define PARAM_DECLARE(NAME, ...) bool paramDeclareConstructor \
-	{ [this] { this->setName(NAME), this->add(__VA_ARGS__); return true; }() };
-#endif
 
 namespace ofxCanon {
 	
@@ -46,11 +40,15 @@ namespace ofxCanon {
 					float batteryQuality = 1.0f;
 					bool psuPresent = false;
 				} battery;
+
+				string toString() const;
 			};
 
 			struct LensInfo {
 				bool lensAttached = false;
 				string lensName;
+
+				string toString() const;
 			};
 
 			struct PhotoMetadata {
@@ -90,7 +88,8 @@ namespace ofxCanon {
 
 			future<PhotoCaptureResult> takePhotoAsync();
 
-			// take photo (e.g. with 8bit, 16bit pixels types)
+			// take photo and wait until complete
+			// pass in your own ofPixels or ofShortPixels (i.e. for 8bit and 16bit images)
 			template<typename PixelsType>
 			PhotoCaptureResult takePhoto(ofPixels_<PixelsType> & pixelsOut) {
 				auto future = this->takePhotoAsync();
@@ -105,6 +104,8 @@ namespace ofxCanon {
 				}
 				return result;
 			}
+
+			bool getLiveView(ofPixels &) const;
 
 			CaptureStatus getCaptureStatus() const;
 
@@ -124,19 +125,22 @@ namespace ofxCanon {
 			float getShutterSpeed() const;
 			void setShutterSpeed(float shutterSpeed);
 
+			bool getLiveViewEnabled() const;
+			void setLiveViewEnabled(bool liveViewEnabled, bool enableCameraScreen = true);
+
 			template<typename DataType>
-			DataType getProperty(EdsPropertyID propertyID) {
+			DataType getProperty(EdsPropertyID propertyID) const {
 				DataType value;
-				CHECK_ERROR(EdsGetPropertyData(this->camera, propertyID, 0, sizeof(DataType), &value)
+				ERROR_GOTO_FAIL(EdsGetPropertyData(this->camera, propertyID, 0, sizeof(DataType), &value)
 					, "Get property : " + propertyToString(propertyID));
 			fail:
 				return value;
 			}
 
 			template<typename DataType>
-			vector<DataType> getPropertyArray(EdsPropertyID propertyID, size_t size) {
+			vector<DataType> getPropertyArray(EdsPropertyID propertyID, size_t size) const {
 				vector<DataType> value(size);
-				CHECK_ERROR(EdsGetPropertyData(this->camera, propertyID, 0, (EdsUInt32)(sizeof(DataType) * size), value.data())
+				ERROR_GOTO_FAIL(EdsGetPropertyData(this->camera, propertyID, 0, (EdsUInt32)(sizeof(DataType) * size), value.data())
 					, "Get property array : " + propertyToString(propertyID));
 				return value;
 			fail:
@@ -146,7 +150,7 @@ namespace ofxCanon {
 
 			template<typename DataType>
 			bool setProperty(EdsPropertyID propertyID, DataType value) {
-				CHECK_ERROR(EdsSetPropertyData(this->camera, propertyID, 0, sizeof(DataType), &value)
+				ERROR_GOTO_FAIL(EdsSetPropertyData(this->camera, propertyID, 0, sizeof(DataType), &value)
 					, "Set property : " + propertyToString(propertyID));
 				return true;
 			fail:
@@ -156,18 +160,20 @@ namespace ofxCanon {
 			bool getLogDeviceCallbacks() const;
 			void setLogDeviceCallbacks(bool);
 
+			typedef function<void()> Action;
+			void performInCameraThread(Action &&);
+			void performInCameraThreadBlocking(Action &&);
+
 			//these events will always fire in the camera thread
 			ofEvent<EdsPropertyID> onParameterOptionsChange;
 			ofEvent<LensInfo> onLensChange;
 		protected:
 			friend Handlers;
 
-			typedef function<void()> Action;
-			void performInCameraThread(Action &&);
-			void performInCameraThreadBlocking(Action &&);
 			std::thread::id cameraThreadId;
 
 			void download(EdsDirectoryItemRef);
+
 			void lensChanged();
 
 			void pollProperty(EdsPropertyID);
@@ -192,6 +198,14 @@ namespace ofxCanon {
 			mutex blockingActionMutex;
 			Action blockingAction;
 
+			bool liveViewEnabled = false;
+
+#ifndef PARAM_DECLARE
+			// Syntactic sugar which enables struct-ofParameterGroup
+#define PARAM_DECLARE(NAME, ...) bool paramDeclareConstructor \
+	{ [this] { this->setName(NAME), this->add(__VA_ARGS__); return true; }() };
+#endif
+
 			struct Parameters : ofParameterGroup {
 				ofParameter<int> ISO{ "ISO", 400 };
 				ofParameter<float> aperture{ "Aperture", 5.6 };
@@ -200,5 +214,6 @@ namespace ofxCanon {
 				PARAM_DECLARE("Canon Camera Parameters", ISO, aperture, shutterSpeed);
 			} parameters;
 	};
+
 	vector<shared_ptr<Device>> listDevices();
 }

@@ -1,6 +1,7 @@
 #include "Initializer.h"
 
 #include "ofLog.h"
+
 #include <memory>
 #include "EDSDK.h"
 
