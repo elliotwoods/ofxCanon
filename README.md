@@ -9,11 +9,12 @@ An openFrameworks addon for interfacing with Canon DSLR cameras.
 * Photo taking
   * Blocking or Async (using C++11 `std::future`)
   * 8bit and 16bit
+* Live view capture
 * ISO / Aperture / Shutter speed settings (+ ofParameter support)
 * Lens information (+ events when lens is changed)
 * Stricter threading model
-    * Ability to call functions in different threads 'remotely'
-    * `std::future` for async capture
+    * Ability to call functions in different threads 'remotely' without instruction queues.
+    * `std::future` for async photo capture
     * Use it directly with your own threads, or use the `Simple` class to manage threads for you
 * Backwards compatability with `ofxEdsdk::Camera`
 
