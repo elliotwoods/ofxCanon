@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\ofApp.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\pairs\ofxMachineVision\Device\Canon.cpp">
+      <Filter>pairs\ofxMachineVision\Device</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{d8376475-7454-4a24-b08a-aac121d3ad6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pairs">
+      <UniqueIdentifier>{300af5f7-6cfe-489e-bcee-7e73209b34d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pairs\ofxMachineVision">
+      <UniqueIdentifier>{211cc3f8-dd92-4330-a237-6000f5ad703c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pairs\ofxMachineVision\Device">
+      <UniqueIdentifier>{c45562a6-6718-4858-89c8-ae696749bad9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\ofApp.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\pairs\ofxMachineVision\Device\Canon.h">
+      <Filter>pairs\ofxMachineVision\Device</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

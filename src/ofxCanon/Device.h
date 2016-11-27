@@ -89,6 +89,7 @@ namespace ofxCanon {
 
 			// take photo and wait until complete
 			// pass in your own ofPixels or ofShortPixels (i.e. for 8bit and 16bit images)
+			// NOTE : this function is only compatible with the main thread (since it uses glfwPollEvents), you must use takePhotoAsync otherwise
 			template<typename PixelsType>
 			PhotoCaptureResult takePhoto(ofPixels_<PixelsType> & pixelsOut) {
 				auto future = this->takePhotoAsync();
