@@ -45,9 +45,8 @@ Commit #[6b1b18b](https://github.com/elliotwoods/ofxCanon/commit/6b1b18b3edada5c
 
 ## XCode
 
-1. Add the `EDSDK.framework` to your project (make sure to check 'add to Target')
-2. Add the `libs/EDSDK/Header/` folder to your project
-3. Set your macOS Deployment target to be `10.8` or later
+1. Use the Project Generator to add ofxCanon to a new or existing project
+2. Set your macOS Deployment target to be `10.8` or later
 
 Optional : For 32-bit builds you can add the `DPP.framework` to your project if you want to use the EDSDK (rather than FreeImage) to develop RAW images and recover metadata from images. Note : if you don't definitely know you that need this then don't worry about it.
 
