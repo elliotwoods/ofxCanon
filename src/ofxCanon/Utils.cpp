@@ -349,14 +349,25 @@ namespace ofxCanon {
 
 	//----------
 	template<typename RawType>
-	EdsUInt32 encode(const map<EdsUInt32, RawType> & encodings, RawType value) {
-		for (auto & encodedIterator : encodings) {
-			// we use >= than so we can round up when no value is available
-			//	e.g. if somebody types Av=4.3, then we'll land on Av=4.5													
-			if (encodedIterator.second >= value) {
-				return encodedIterator.first;
-			}
-		}
+	EdsUInt32 encode(const map<EdsUInt32, RawType> & encodings, RawType value, bool ascendingValues) {
+        
+        if(ascendingValues) {
+            for (auto encodedIterator = encodings.begin(); encodedIterator != encodings.end(); encodedIterator++) {
+                // we use >= than so we can round up when no value is available
+                //	e.g. if somebody types Av=4.3, then we'll land on Av=4.5
+                if (encodedIterator->second >= value) {
+                    return encodedIterator->first;
+                }
+            }
+        } else {
+            for (auto encodedIterator = encodings.rbegin(); encodedIterator != encodings.rend(); encodedIterator++) {
+                // we use >= than so we can round up when no value is available
+                //	e.g. if somebody types Av=4.3, then we'll land on Av=4.5
+                if (encodedIterator->second >= value) {
+                    return encodedIterator->first;
+                }
+            }
+        }
 
 		//default value
 		return 0xffffffff;
@@ -406,7 +417,7 @@ namespace ofxCanon {
 
 	//----------
 	EdsUInt32 encodeISO(int isoValue) {
-		return encode(getISOEncodings(), isoValue);
+		return encode(getISOEncodings(), isoValue, true);
 	}
 
 #pragma warning (disable : 4305)
@@ -480,7 +491,7 @@ namespace ofxCanon {
 
 	//----------
 	EdsUInt32 encodeAperture(float apertureValue) {
-		return encode(getApertureEncodings(), apertureValue);
+		return encode(getApertureEncodings(), apertureValue, true);
 	}
 
 #pragma warning (disable : 4305)
@@ -565,7 +576,7 @@ namespace ofxCanon {
 
 	//----------
 	EdsUInt32 encodeShutterSpeed(float shutterSpeedValue) {
-		return encode(getShutterSpeedEncodings(), shutterSpeedValue);
+		return encode(getShutterSpeedEncodings(), shutterSpeedValue, false);
 	}
 
 	//----------

@@ -299,16 +299,6 @@ namespace ofxCanon {
 
 	//----------
 	void Device::download(EdsDirectoryItemRef directoryItem) {
-		if (!this->capturePromise) {
-			// no photo taking is taking place (e.g. we're downloading something which we didn't ask to capture)
-			// so we just clean up
-
-			WARNING(EdsRelease(directoryItem)
-				, "Release directory item");
-
-			return;
-		}
-
 		PhotoCaptureResult photoCaptureAsyncResult;
 		try {
 			EdsDirectoryItemInfo directoryItemInfo;
@@ -362,15 +352,20 @@ namespace ofxCanon {
 			ERROR_THROW(EdsRelease(encodedStream)
 				, "Release encoded stream");
 
-			this->hasDownloadedFirstPhoto = true;
-			this->captureStatus = CaptureStatus::CaptureSucceeded;
-
+            photoCaptureAsyncResult.errorReturned = EDS_ERR_OK;
+            photoCaptureAsyncResult.encodedBuffer = buffer;
+            photoCaptureAsyncResult.metaData = metaData;
+            
 			//if we've got an async listener waiting for a photo
 			if (this->capturePromise) {
-				photoCaptureAsyncResult.errorReturned = EDS_ERR_OK;
-				photoCaptureAsyncResult.encodedBuffer = buffer;
-				photoCaptureAsyncResult.metaData = metaData;
-			}
+                this->hasDownloadedFirstPhoto = true;
+                this->captureStatus = CaptureStatus::CaptureSucceeded;
+                
+                this->capturePromise->set_value(photoCaptureAsyncResult);
+                this->capturePromise.reset();
+            } else {
+                this->onUnrequestedPhotoReceived.notify(this, photoCaptureAsyncResult);
+            }
 		}
 		catch (EdsError error) {
 			this->captureStatus = CaptureStatus::CaptureFailed;
@@ -378,11 +373,11 @@ namespace ofxCanon {
 			//if we've got an async listener waiting for a photo
 			if (this->capturePromise) {
 				photoCaptureAsyncResult.errorReturned = error;
+                
+                this->capturePromise->set_value(photoCaptureAsyncResult);
+                this->capturePromise.reset();
 			}
 		}
-
-		this->capturePromise->set_value(photoCaptureAsyncResult);
-		this->capturePromise.reset();
 	}
 
 	//----------
