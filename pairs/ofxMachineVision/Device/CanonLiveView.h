@@ -5,20 +5,15 @@
 
 namespace ofxMachineVision {
 	namespace Device {
-		class Canon : public Updating {
+		class CanonLiveView: public Updating {
 		public:
-			Canon();
+			CanonLiveView();
 			string getTypeName() const override;
-<<<<<<< Updated upstream
-			shared_ptr<Base::InitialisationSettings> getDefaultSettings() override {
-=======
 			shared_ptr<Base::InitialisationSettings> getDefaultSettings() const override {
->>>>>>> Stashed changes
 				return make_shared<Base::InitialisationSettings>();
 			}
 			Specification open(shared_ptr<Base::InitialisationSettings> = nullptr) override;
 			void close() override;
-			void singleShot() override;
 
 			void updateIsFrameNew() override;
 			bool isFrameNew() override;
@@ -28,11 +23,7 @@ namespace ofxMachineVision {
 		protected:
 			int frameIndex;
 			bool markFrameNew;
-<<<<<<< Updated upstream
-			ofxMachineVision::Microseconds openTime;
-=======
-			chrono::system_clock::time_point openTime;
->>>>>>> Stashed changes
+			chrono::high_resolution_clock::time_point openTime;
 			shared_ptr<ofxCanon::Simple> camera;
 		};
 	}
