@@ -9,11 +9,7 @@ namespace ofxMachineVision {
 		public:
 			Canon();
 			string getTypeName() const override;
-<<<<<<< Updated upstream
-			shared_ptr<Base::InitialisationSettings> getDefaultSettings() override {
-=======
 			shared_ptr<Base::InitialisationSettings> getDefaultSettings() const override {
->>>>>>> Stashed changes
 				return make_shared<Base::InitialisationSettings>();
 			}
 			Specification open(shared_ptr<Base::InitialisationSettings> = nullptr) override;
@@ -26,13 +22,9 @@ namespace ofxMachineVision {
 
 			shared_ptr<ofxCanon::Simple> getCamera();
 		protected:
-			int frameIndex;
-			bool markFrameNew;
-<<<<<<< Updated upstream
-			ofxMachineVision::Microseconds openTime;
-=======
+			int frameIndex = 0;
+			bool markFrameNew = false;
 			chrono::system_clock::time_point openTime;
->>>>>>> Stashed changes
 			shared_ptr<ofxCanon::Simple> camera;
 		};
 	}

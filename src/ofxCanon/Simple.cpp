@@ -120,8 +120,8 @@ namespace ofxCanon {
 #endif
 		});
 		
-		bool success;
-		reportSuccess.receive(success);
+		bool success = false;
+		reportSuccess.tryReceive(success, 20000);
 		if (!success) {
 			this->close();
 		}

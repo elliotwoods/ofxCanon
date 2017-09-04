@@ -15,7 +15,7 @@ namespace ofxCanon {
 
 		All operations which happen on this class should come from the 'Camera thread'
 		which is a thread that you own externally. That could be your main thread, or 
-		any thread that you've created. You should regularly call Device::idleFunction()
+		any thread that you've created. You should regularly call Device::update()
 		from that thread (e.g. in your update loop if you're using your main thread).
 
 		Often you will want to wrap this class in something which handles threading
@@ -167,6 +167,7 @@ namespace ofxCanon {
 			//these events will always fire in the camera thread
 			ofEvent<EdsPropertyID> onParameterOptionsChange;
 			ofEvent<LensInfo> onLensChange;
+            ofEvent<PhotoCaptureResult> onUnrequestedPhotoReceived;
 		protected:
 			friend Handlers;
 
