@@ -11,6 +11,8 @@ class ofApp : public ofBaseApp{
 		void update();
 		void draw();
 
+		void takePhoto();
+
 		void keyPressed(int key);
 		void keyReleased(int key);
 		void mouseMoved(int x, int y );
@@ -24,18 +26,23 @@ class ofApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
     
     struct Parameters : ofParameterGroup {
-        ofParameter<int> timeBetweenExposures {"Time between exposures [s]", 5};
-        ofParameter<float> timeUntilNextExposure{"Time until next exposure [s]", 5};
-        ofParameter<bool> run {"Run", false};
+        ofParameter<float> timeBetweenExposures {"Time between exposures [s]", 10, 0, 60};
+		ofParameter<bool> captureOnStartRun{ "Capture on start run", true };
+		ofParameter<bool> saveEnabed{ "Save enabled", true };
         Parameters() {
             this->add(timeBetweenExposures);
-            this->add(timeUntilNextExposure);
-            this->add(run);
+			this->add(captureOnStartRun);
+			this->add(saveEnabed);
         }
     } parameters;
     
     ofxCvGui::Builder gui;
     ofImage preview;
     
-    ofxCanon::Simple camera;
+	bool run = false;
+	size_t index = 0;
+
+    shared_ptr<ofxCanon::Device> cameraDevice;
+	future<ofxCanon::Device::PhotoCaptureResult> asyncCapture;
+	chrono::high_resolution_clock::time_point lastCaptureTrigger;
 };
