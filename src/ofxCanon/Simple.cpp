@@ -6,7 +6,13 @@
 #endif
 
 namespace ofxCanon {
+#pragma mark CameraThread
+	//----------
+	void Simple::CameraThread::lensChangeCallback(Device::LensInfo & lensInfo) {
+		this->lensIsNew = true;
+	}
 
+#pragma mark Simple
 	//----------
 	Simple::~Simple() {
 		this->close();
@@ -64,6 +70,8 @@ namespace ofxCanon {
 					this->cameraThread->device->setLiveViewEnabled(true);
 				}
 
+				ofAddListener(this->cameraThread->device->onLensChange, this->cameraThread.get(), &CameraThread::lensChangeCallback);
+
 				while (!this->cameraThread->closeThread) {
 
 					//receive incoming photo
@@ -111,6 +119,8 @@ namespace ofxCanon {
 					//from ofxEdsdk
 					ofSleepMillis(5);
 				}
+
+				ofRemoveListener(this->cameraThread->device->onLensChange, this->cameraThread.get(), &CameraThread::lensChangeCallback);
 
 				this->cameraThread->device->close();
 			}
@@ -164,6 +174,11 @@ namespace ofxCanon {
 					this->liveViewIsNew = true;
 					this->cameraThread->liveViewIsNew = false;
 				}
+			}
+
+			{
+				this->lensIsNew = this->cameraThread->lensIsNew;
+				this->cameraThread->lensIsNew = false;
 			}
 		}
 	}
@@ -287,16 +302,17 @@ namespace ofxCanon {
 
 	//----------
 	void Simple::beginMovieRecording() {
-
+		// Currently unsupported sorry
 	}
 
 	//----------
 	void Simple::endMovieRecording() {
-
+		// Currently unsupported sorry
 	}
 
 	//----------
 	bool Simple::isMovieNew() {
+		// Currently unsupported sorry
 		return false;
 	}
 
@@ -310,4 +326,13 @@ namespace ofxCanon {
 		}
 	}
 
+	//----------
+	bool Simple::isLensNew() const {
+		return this->lensIsNew;
+	}
+
+	//----------
+	shared_ptr<Simple::CameraThread> Simple::getCameraThread() {
+		return this->cameraThread;
+	}
 }

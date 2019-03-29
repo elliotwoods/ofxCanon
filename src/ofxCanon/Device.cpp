@@ -590,7 +590,27 @@ namespace ofxCanon {
 	}
 
 	//----------
-	void Device::setISO(int ISO) {
+	template<typename T>
+	T findClosestOption(const T & value, const vector<T> & options) {
+		T bestDistance = std::numeric_limits<T>::max();
+		T bestOption = value;
+
+		for (const auto & option : options) {
+			auto distance = abs(option - value);
+			if (distance < bestDistance) {
+				bestDistance = distance;
+				bestOption = option;
+			}
+		}
+
+		return bestOption;
+	}
+
+	//----------
+	void Device::setISO(int ISO, bool findClosest) {
+		if (findClosest) {
+			ISO = findClosestOption(ISO, this->getISOOptions());
+		}
 		this->parameters.ISO = ISO;
 	}
 
@@ -600,7 +620,10 @@ namespace ofxCanon {
 	}
 
 	//----------
-	void Device::setAperture(float aperture) {
+	void Device::setAperture(float aperture, bool findClosest) {
+		if (findClosest) {
+			aperture = findClosestOption(aperture, this->getApertureOptions());
+		}
 		this->parameters.aperture = aperture;
 	}
 
@@ -610,7 +633,10 @@ namespace ofxCanon {
 	}
 
 	//----------
-	void Device::setShutterSpeed(float shutterSpeed) {
+	void Device::setShutterSpeed(float shutterSpeed, bool findClosest) {
+		if (findClosest) {
+			shutterSpeed = findClosestOption(shutterSpeed, this->getShutterSpeedOptions());
+		}
 		this->parameters.shutterSpeed = shutterSpeed;
 	}
 

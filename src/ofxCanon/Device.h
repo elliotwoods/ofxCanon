@@ -117,13 +117,13 @@ namespace ofxCanon {
 			vector<float> getShutterSpeedOptions() const;
 
 			int getISO() const;
-			void setISO(int ISO);
+			void setISO(int ISO, bool findClosest = true);
 
 			float getAperture() const;
-			void setAperture(float aperture);
+			void setAperture(float aperture, bool findClosest = true);
 
 			float getShutterSpeed() const;
-			void setShutterSpeed(float shutterSpeed);
+			void setShutterSpeed(float shutterSpeed, bool findClosest = true);
 
 			bool getLiveViewEnabled() const;
 			void setLiveViewEnabled(bool liveViewEnabled, bool enableCameraScreen = true);

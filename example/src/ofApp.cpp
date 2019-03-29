@@ -39,6 +39,9 @@ void ofApp::draw(){
 			status << "[A]perture : \t\t" << device->getAperture() << endl;
 			status << "[S]hutter Speed : \t" << device->getShutterSpeed() << endl;
 		}
+
+		status << "Press [SPACE] to take a photo" << endl;
+
 		ofDrawBitmapStringHighlight(status.str(), 30, 30, ofColor(200, 100, 100), ofColor::white);
 	}
 }

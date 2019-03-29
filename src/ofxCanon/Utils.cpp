@@ -342,7 +342,7 @@ namespace ofxCanon {
 			return findIterator->second;
 		}
 		else {
-			//default value
+			//error value
 			return 0;
 		}
 	}
@@ -351,14 +351,12 @@ namespace ofxCanon {
 	template<typename RawType>
 	EdsUInt32 encode(const map<EdsUInt32, RawType> & encodings, RawType value) {
 		for (auto & encodedIterator : encodings) {
-			// we use >= than so we can round up when no value is available
-			//	e.g. if somebody types Av=4.3, then we'll land on Av=4.5													
-			if (encodedIterator.second >= value) {
+			if (encodedIterator.second == value) {
 				return encodedIterator.first;
 			}
 		}
 
-		//default value
+		//error value
 		return 0xffffffff;
 	}
 

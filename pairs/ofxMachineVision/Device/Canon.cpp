@@ -34,7 +34,7 @@ namespace ofxMachineVision {
 				this->camera->update();
 				glfwPollEvents();
 				ofSleepMillis(1);
-				if (ofGetElapsedTimef() - startTime > 30.0f) {
+				if (ofGetElapsedTimef() - startTime > 31.0f) {
 					throw(ofxMachineVision::Exception("Timeout opening device Canon. Check you have a memory card in your camera and that the exposure length is not too long."));
 				}
 			}

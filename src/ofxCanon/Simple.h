@@ -10,6 +10,31 @@ namespace ofxCanon {
 	//The Simple class conceals thread complexity away from the user of ofxCanon (mirrors ofxEdsdk interface).
 	class Simple {
 	public:
+		struct CameraThread {
+			void lensChangeCallback(Device::LensInfo & lensInfo);
+
+			shared_ptr<Device> device;
+			std::thread thread;
+
+
+			ofPixels photoLoad;
+			ofPixels photo;
+			bool photoIsNew = false;
+			mutex photoMutex;
+
+			ofPixels liveViewLoad;
+			ofPixels liveView;
+			bool liveViewIsNew = false;
+			mutex liveViewMutex;
+
+			future<Device::PhotoCaptureResult> futurePhoto;
+
+			bool lensIsNew = false;
+			bool closeThread = false;
+
+			queue<function<void()>> actionQueue;
+		};
+
 		//We directly mirror the interface of ofxEdsdk as of August 31st 2016, changes:
 		// * setup returns a bool
 		// * close returns a void
@@ -53,27 +78,10 @@ namespace ofxCanon {
 
 		bool isConnected();
 
+		bool isLensNew() const;
+
+		shared_ptr<CameraThread> getCameraThread();
 	protected:
-		struct CameraThread {
-			shared_ptr<Device> device;
-			std::thread thread;
-
-
-			ofPixels photoLoad;
-			ofPixels photo;
-			bool photoIsNew = false;
-			mutex photoMutex;
-
-			ofPixels liveViewLoad;
-			ofPixels liveView;
-			bool liveViewIsNew = false;
-			mutex liveViewMutex;
-
-			future<Device::PhotoCaptureResult> futurePhoto;
-
-			bool closeThread = false;
-		};
-
 		int deviceId = 0;
 		int orientationMode = 0;
 		bool useLiveView = true;
@@ -88,5 +96,7 @@ namespace ofxCanon {
 		ofTexture liveViewTexture;
 		bool liveViewIsNew = false;
 		FramerateCounter liveViewFramerateCounter;
+
+		bool lensIsNew = false;
 	};
 }
