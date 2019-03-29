@@ -192,11 +192,7 @@ namespace ofxCanon {
 			DeviceInfo deviceInfo;
 			LensInfo lensInfo;
 
-			mutex actionQueueMutex;
-			queue<Action> actionQueue;
-
-			mutex blockingActionMutex;
-			Action blockingAction;
+			ofThreadChannel<Action> actionQueue;
 
 			bool liveViewEnabled = false;
 

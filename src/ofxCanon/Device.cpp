@@ -103,21 +103,11 @@ namespace ofxCanon {
 
 	//----------
 	void Device::update() {
-		//perform any immediate blocking action
-		{
-			unique_lock<mutex> lock(this->blockingActionMutex);
-			if (this->blockingAction) {
-				this->blockingAction();
-				this->blockingAction = Action(); // clear action
-			}
-		}
-
 		//perform outstanding actions in queue
 		{
-			unique_lock<mutex> lock(this->actionQueueMutex);
-			while (!actionQueue.empty()) {
-				actionQueue.front()();
-				actionQueue.pop();
+			Action action;
+			if (this->actionQueue.tryReceive(action)) {
+				action();
 			}
 		}
 	}
@@ -260,40 +250,31 @@ namespace ofxCanon {
 		}
 		else {
 			// We're calling from another thread, queue the action for later
-			unique_lock<mutex> lock(this->actionQueueMutex);
-			this->actionQueue.emplace(action);
+			this->actionQueue.send(move(action));
 		}
 	}
 
 	//----------
 	void Device::performInCameraThreadBlocking(Action && action) {
 		if (this_thread::get_id() == this->cameraThreadId) {
+			// We're already in the camera thread
 			action();
 		}
 		else {
-			while (true) {
-				{
-					unique_lock<mutex> lock(this->blockingActionMutex);
-					if (!this->blockingAction) {
-						//no blocking action waiting
-						this->blockingAction = action;
-						break;
-					}
-				}
+			ofThreadChannel<int> returnChannel;
 
-				//already have a blocking action waiting before this one
-				this_thread::sleep_for(chrono::milliseconds(10));
-			}
+			//wrap the action so that it returns messages
+			auto wrappedAction = [this, action, &returnChannel]() {
+				action();
+				returnChannel.send(0);
+			};
 
-			while (true) {
-				unique_lock<mutex> lock(this->blockingActionMutex);
-				if (!this->blockingAction) {
-					break;
-				}
+			//send the action to be performed
+			this->actionQueue.send(move(wrappedAction));
 
-				//waiting for our blocking action to complete
-				this_thread::sleep_for(chrono::milliseconds(10));
-			}
+			// Wait for the return
+			int returnedValue;
+			returnChannel.receive(returnedValue);
 		}
 	}
 

@@ -25,7 +25,13 @@ namespace ofxRulr {
 					weak_ptr<Nodes::Base> cameraNode;
 					weak_ptr<ofxMachineVision::Grabber::Base> cameraGrabber;
 					weak_ptr<ofxMachineVision::Device::Base> cameraDevice;
+
+					weak_ptr<ofxCanon::Device> rawDevice;
 				} cached;
+
+				shared_ptr<ofxCvGui::Widgets::MultipleChoice> isoSelector;
+				shared_ptr<ofxCvGui::Widgets::MultipleChoice> apertureSelector;
+				float currentShutterSpeed = 0.0f;
 			};
 		}
 	}

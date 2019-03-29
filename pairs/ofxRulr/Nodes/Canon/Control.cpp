@@ -17,6 +17,8 @@ namespace ofxRulr {
 
 			//---------
 			void Control::init() {
+				RULR_NODE_UPDATE_LISTENER;
+
 				this->addInput<Item::Camera>();
 			}
 
@@ -58,6 +60,30 @@ namespace ofxRulr {
 				if (needsRebuild) {
 					this->rebuildGui();
 				}
+
+				//update the values
+				{
+					auto rawDevice = this->cached.rawDevice.lock();
+					if (rawDevice) {
+						int ISO;
+						float aperture;
+						float shutterSpeed;
+
+						rawDevice->performInCameraThreadBlocking([&]() {
+							ISO = rawDevice->getISO();
+							aperture = rawDevice->getAperture();
+							shutterSpeed = rawDevice->getShutterSpeed();
+						});
+
+						if (this->isoSelector) {
+							this->isoSelector->setSelection(ofToString(ISO));
+						}
+						if (this->apertureSelector) {
+							this->apertureSelector->setSelection(ofToString(aperture));
+						}
+						this->currentShutterSpeed = shutterSpeed;
+					}
+				}
 			}
 
 			//---------
@@ -68,18 +94,30 @@ namespace ofxRulr {
 
 			//----------
 			void Control::rebuildGui() {
+				//clear the panel to start with
 				this->panel->clear();
+				this->isoSelector.reset();
+				this->apertureSelector.reset();
+				this->cached.rawDevice.reset();
+
 				auto cameraNode = this->getInput<Item::Camera>();
+				this->cached.cameraNode = cameraNode;
+
 				if(cameraNode) {
 					auto grabber = cameraNode->getGrabber();
+					this->cached.cameraGrabber = grabber;
+
 					if (grabber) {
 						auto device = dynamic_pointer_cast<ofxMachineVision::Device::Canon>(grabber->getDevice());
+						this->cached.cameraDevice = device;
+
 						if (device) {
 							auto simpleCamera = device->getCamera();
 							if (simpleCamera) {
 								auto cameraThread = simpleCamera->getCameraThread();
 								if (cameraThread) {
 									auto device = cameraThread->device;
+									this->cached.rawDevice = device;
 
 									string bodyName;
 									string lensName;
@@ -87,7 +125,7 @@ namespace ofxRulr {
 									vector<float> apertureOptions;
 									vector<float> shutterSpeedOptions;
 
-									cameraThread->device->performInCameraThreadBlocking([&]() {
+									device->performInCameraThreadBlocking([&]() {
 										bodyName = device->getDeviceInfo().description;
 										lensName = device->getLensInfo().lensName;
 										isoOptions = device->getISOOptions();
@@ -112,6 +150,11 @@ namespace ofxRulr {
 										for (const auto & option : isoOptions) {
 											widget->addOption(ofToString(option));
 										}
+										widget->onValueChange += [device, widget](int) {
+											auto isoValue = ofToInt(widget->getSelection());
+											device->setISO(isoValue);
+										};
+										this->isoSelector = widget;
 									}
 
 									{
@@ -119,13 +162,22 @@ namespace ofxRulr {
 										for (const auto & option : apertureOptions) {
 											widget->addOption(ofToString(option));
 										}
+										widget->onValueChange += [device, widget](int) {
+											auto apertureValue = ofToFloat(widget->getSelection());
+											device->setAperture(apertureValue);
+										};
+										this->apertureSelector = widget;
 									}
 
 									{
-										auto widget = this->panel->addMultipleChoice("Shutter Speed");
-										for (const auto & option : shutterSpeedOptions) {
-											widget->addOption(ofToString(option));
-										}
+										auto widget = this->panel->addEditableValue<float>("Shutter Speed", [this]() {
+											return this->currentShutterSpeed;
+										}, [this, device](string valueString) {
+											auto newShutterSpeed = ofToFloat(valueString);
+											device->performInCameraThreadBlocking([&]() {
+												device->setShutterSpeed(newShutterSpeed, true);
+											});
+										});
 									}
 								}
 							}
