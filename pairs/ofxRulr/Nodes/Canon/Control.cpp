@@ -115,7 +115,7 @@ namespace ofxRulr {
 							auto simpleCamera = device->getCamera();
 							if (simpleCamera) {
 								auto cameraThread = simpleCamera->getCameraThread();
-								if (cameraThread) {
+								if (simpleCamera->isConnected() && cameraThread) {
 									auto device = cameraThread->device;
 									this->cached.rawDevice = device;
 
