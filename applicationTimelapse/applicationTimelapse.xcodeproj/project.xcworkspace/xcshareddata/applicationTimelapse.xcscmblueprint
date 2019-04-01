@@ -1,0 +1,65 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "DB8696D5C2E88BA80494BD07C9AED3CCCAC10C7B",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "0B8A4FA6044A03529CCE18C1912A64B865F99ACB" : 9223372036854775807,
+    "E71E5D7A16B01AB780ADC5C4D1DF114B82BFDD6D" : 9223372036854775807,
+    "F6FB2705B3D7C82B526C84D3B04A0A2338ECDE64" : 9223372036854775807,
+    "A6343E16BC2F648D0FEA647FB75CBADE0A25E0B8" : 9223372036854775807,
+    "C4A4227C90560D4A126D81E16DDDB4026E9182E4" : 9223372036854775807,
+    "DB8696D5C2E88BA80494BD07C9AED3CCCAC10C7B" : 9223372036854775807,
+    "BFCE57559947ED43BD3726794AB69C8332086BBC" : 9223372036854775807
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "43EACEF8-8663-4EA3-AF5B-FB535D8379AB",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "0B8A4FA6044A03529CCE18C1912A64B865F99ACB" : "ofxSingleton\/",
+    "E71E5D7A16B01AB780ADC5C4D1DF114B82BFDD6D" : "ofxGrabCam\/",
+    "F6FB2705B3D7C82B526C84D3B04A0A2338ECDE64" : "ofxLiquidEvent\/",
+    "A6343E16BC2F648D0FEA647FB75CBADE0A25E0B8" : "ofxTextInputField\/",
+    "C4A4227C90560D4A126D81E16DDDB4026E9182E4" : "ofxAssets\/",
+    "DB8696D5C2E88BA80494BD07C9AED3CCCAC10C7B" : "ofxCanon\/",
+    "BFCE57559947ED43BD3726794AB69C8332086BBC" : "ofxCvGui\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "applicationTimelapse",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "applicationTimelapse\/applicationTimelapse.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "github.com:elliotwoods\/ofxSingleton.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "0B8A4FA6044A03529CCE18C1912A64B865F99ACB"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "github.com:elliotwoods\/ofxTextInputField.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "A6343E16BC2F648D0FEA647FB75CBADE0A25E0B8"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "github.com:elliotwoods\/ofxCvGui.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "BFCE57559947ED43BD3726794AB69C8332086BBC"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "github.com:elliotwoods\/ofxAssets.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "C4A4227C90560D4A126D81E16DDDB4026E9182E4"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "github.com:elliotwoods\/ofxCanon.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "DB8696D5C2E88BA80494BD07C9AED3CCCAC10C7B"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "github.com:elliotwoods\/ofxGrabCam.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "E71E5D7A16B01AB780ADC5C4D1DF114B82BFDD6D"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "github.com:elliotwoods\/ofxLiquidEvent.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "F6FB2705B3D7C82B526C84D3B04A0A2338ECDE64"
+    }
+  ]
+}
