@@ -66,6 +66,8 @@ namespace ofxCanon {
 
 			//in this thread, start operating the camera
 			if (success) {
+				this->connected = true;
+
 				if (this->useLiveView) {
 					this->cameraThread->device->setLiveViewEnabled(true);
 				}
@@ -123,6 +125,10 @@ namespace ofxCanon {
 				ofRemoveListener(this->cameraThread->device->onLensChange, this->cameraThread.get(), &CameraThread::lensChangeCallback);
 
 				this->cameraThread->device->close();
+				this->connected = false;
+			}
+			else {
+				this->connected = false;
 			}
 
 #if defined(TARGET_WIN32)
@@ -145,6 +151,8 @@ namespace ofxCanon {
 			if (this->cameraThread->thread.joinable()) {
 				this->cameraThread->thread.join();
 			}
+
+			this->connected = false;
 		}
 	}
 
@@ -318,12 +326,7 @@ namespace ofxCanon {
 
 	//----------
 	bool Simple::isConnected() {
-		if (this->cameraThread) {
-			return true;
-		}
-		else {
-			return false;
-		}
+		return this->connected;
 	}
 
 	//----------

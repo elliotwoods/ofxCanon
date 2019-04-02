@@ -85,6 +85,7 @@ namespace ofxCanon {
 		int deviceId = 0;
 		int orientationMode = 0;
 		bool useLiveView = true;
+		atomic<bool> connected = false;
 
 		shared_ptr<CameraThread> cameraThread;
 
