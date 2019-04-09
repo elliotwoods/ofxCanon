@@ -7,9 +7,6 @@ void ofApp::setup() {
 	for (auto device : devices) {
 		device->open();
 		this->device = device;
-		this->device->setProperty(kEdsPropID_FlashMode, 0);
-		this->keyPressed(' '); //take photo
-		this->device->setProperty(kEdsPropID_FlashMode, 1);
 		this->keyPressed(' '); //take photo
 		break;
 	}
