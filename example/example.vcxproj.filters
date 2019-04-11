@@ -7,15 +7,90 @@
 		<ClCompile Include="src\main.cpp">
 			<Filter>src</Filter>
 		</ClCompile>
+		<ClCompile Include="src\main.cpp">
+			<Filter>src</Filter>
+		</ClCompile>
+		<ClCompile Include="src\ofApp.cpp">
+			<Filter>src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxCanon\src\ofxCanon\Handlers.cpp">
+			<Filter>addons\ofxCanon\src\ofxCanon</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxCanon\src\ofxCanon\Initializer.cpp">
+			<Filter>addons\ofxCanon\src\ofxCanon</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxCanon\src\ofxCanon\Utils.cpp">
+			<Filter>addons\ofxCanon\src\ofxCanon</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxCanon\src\ofxCanon\Device.cpp">
+			<Filter>addons\ofxCanon\src\ofxCanon</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxCanon\src\ofxCanon\Simple.cpp">
+			<Filter>addons\ofxCanon\src\ofxCanon</Filter>
+		</ClCompile>
 	</ItemGroup>
 	<ItemGroup>
 		<Filter Include="src">
 			<UniqueIdentifier>{d8376475-7454-4a24-b08a-aac121d3ad6f}</UniqueIdentifier>
 		</Filter>
+		<Filter Include="addons">
+			<UniqueIdentifier>{71834F65-F3A9-211E-73B8-DC85}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxCanon">
+			<UniqueIdentifier>{AFA969D7-F6E8-4AC2-43A5-7E17}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxCanon\src">
+			<UniqueIdentifier>{D27EAAD9-F5A2-70CA-8B36-03CE}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxCanon\src\ofxCanon">
+			<UniqueIdentifier>{FD9EDEC7-A12D-7FC4-00EF-BF71}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxCanon\libs">
+			<UniqueIdentifier>{EF6C36D7-4D0B-21B7-DCF7-7300}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxCanon\libs\EDSDK">
+			<UniqueIdentifier>{E1A40E8C-F4DF-D2C9-4B85-128D}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxCanon\libs\EDSDK\include">
+			<UniqueIdentifier>{AB3009A7-5043-F1A5-716A-86E6}</UniqueIdentifier>
+		</Filter>
 	</ItemGroup>
 	<ItemGroup>
 		<ClInclude Include="src\ofApp.h">
 			<Filter>src</Filter>
+		</ClInclude>
+		<ClInclude Include="src\ofApp.h">
+			<Filter>src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxCanon\src\ofxCanon.h">
+			<Filter>addons\ofxCanon\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxCanon\src\ofxCanon\EDSDK_include.h">
+			<Filter>addons\ofxCanon\src\ofxCanon</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxCanon\src\ofxCanon\Handlers.h">
+			<Filter>addons\ofxCanon\src\ofxCanon</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxCanon\src\ofxCanon\Initializer.h">
+			<Filter>addons\ofxCanon\src\ofxCanon</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxCanon\src\ofxCanon\Utils.h">
+			<Filter>addons\ofxCanon\src\ofxCanon</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxCanon\src\ofxCanon\Device.h">
+			<Filter>addons\ofxCanon\src\ofxCanon</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxCanon\src\ofxCanon\Simple.h">
+			<Filter>addons\ofxCanon\src\ofxCanon</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxCanon\libs\EDSDK\include\EDSDK.h">
+			<Filter>addons\ofxCanon\libs\EDSDK\include</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxCanon\libs\EDSDK\include\EDSDKErrors.h">
+			<Filter>addons\ofxCanon\libs\EDSDK\include</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxCanon\libs\EDSDK\include\EDSDKTypes.h">
+			<Filter>addons\ofxCanon\libs\EDSDK\include</Filter>
 		</ClInclude>
 	</ItemGroup>
 	<ItemGroup>

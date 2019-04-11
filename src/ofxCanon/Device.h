@@ -2,9 +2,17 @@
 
 #include "Utils.h"
 #include "Handlers.h"
-#include "ofMain.h"
+
+#include "ofPixels.h"
+#include "ofParameter.h"
+#include "ofThreadChannel.h"
+
+#include <GLFW/glfw3.h>
 
 #include <future>
+#include <string>
+#include <vector>
+#include <memory>
 
 namespace ofxCanon {
 	
@@ -24,14 +32,14 @@ namespace ofxCanon {
 	class Device {
 		public:
 			struct DeviceInfo {
-				string description;
-				string port;
+				std::string description;
+				std::string port;
 
 				struct Owner {
-					string manufacturer;
-					string owner;
-					string artist;
-					string copyright;
+					std::string manufacturer;
+					std::string owner;
+					std::string artist;
+					std::string copyright;
 				} owner;
 
 				struct Battery {
@@ -40,14 +48,14 @@ namespace ofxCanon {
 					bool psuPresent = false;
 				} battery;
 
-				string toString() const;
+				std::string toString() const;
 			};
 
 			struct LensInfo {
 				bool lensAttached = false;
-				string lensName;
+				std::string lensName;
 
-				string toString() const;
+				std::string toString() const;
 			};
 
 			struct PhotoMetadata {
@@ -66,8 +74,8 @@ namespace ofxCanon {
 			};
 
 			struct PhotoCaptureResult {
-				shared_ptr<ofBuffer> encodedBuffer;
-				shared_ptr<PhotoMetadata> metaData;
+				std::shared_ptr<ofBuffer> encodedBuffer;
+				std::shared_ptr<PhotoMetadata> metaData;
 				EdsError errorReturned;
 
 				operator bool() const {
@@ -85,7 +93,7 @@ namespace ofxCanon {
 			void close();
 			void update();
 
-			future<PhotoCaptureResult> takePhotoAsync();
+			std::future<PhotoCaptureResult> takePhotoAsync();
 
 			// take photo and wait until complete
 			// pass in your own ofPixels or ofShortPixels (i.e. for 8bit and 16bit images)
@@ -111,10 +119,10 @@ namespace ofxCanon {
 
 			ofParameterGroup & getParameters();
 
-			vector<string> getOptions(const ofAbstractParameter &) const;
-			vector<int> getISOOptions() const;
-			vector<float> getApertureOptions() const;
-			vector<float> getShutterSpeedOptions() const;
+			std::vector<std::string> getOptions(const ofAbstractParameter &) const;
+			std::vector<int> getISOOptions() const;
+			std::vector<float> getApertureOptions() const;
+			std::vector<float> getShutterSpeedOptions() const;
 
 			int getISO() const;
 			void setISO(int ISO, bool findClosest = true);
@@ -138,7 +146,7 @@ namespace ofxCanon {
 			}
 
 			template<typename DataType>
-			vector<DataType> getPropertyArray(EdsPropertyID propertyID, size_t size) const {
+			std::vector<DataType> getPropertyArray(EdsPropertyID propertyID, size_t size) const {
 				vector<DataType> value(size);
 				ERROR_GOTO_FAIL(EdsGetPropertyData(this->camera, propertyID, 0, (EdsUInt32)(sizeof(DataType) * size), value.data())
 					, "Get property array : " + propertyToString(propertyID));
@@ -160,7 +168,7 @@ namespace ofxCanon {
 			bool getLogDeviceCallbacks() const;
 			void setLogDeviceCallbacks(bool);
 
-			typedef function<void()> Action;
+			typedef std::function<void()> Action;
 			void performInCameraThread(Action &&);
 			void performInCameraThreadBlocking(Action &&);
 
@@ -188,7 +196,7 @@ namespace ofxCanon {
 			bool logDeviceCallbacks = false;
 			bool hasDownloadedFirstPhoto = false;
 			CaptureStatus captureStatus = CaptureStatus::NoCaptureTriggered;
-			unique_ptr<promise<PhotoCaptureResult>> capturePromise;
+			std::unique_ptr<std::promise<PhotoCaptureResult>> capturePromise;
 
 			DeviceInfo deviceInfo;
 			LensInfo lensInfo;
@@ -212,5 +220,5 @@ namespace ofxCanon {
 			} parameters;
 	};
 
-	vector<shared_ptr<Device>> listDevices();
+	std::vector<std::shared_ptr<Device>> listDevices();
 }

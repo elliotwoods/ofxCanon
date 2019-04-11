@@ -1,9 +1,13 @@
 #include "Simple.h"
 #include "Initializer.h"
 
+#include "ofImage.h"
+
 #ifdef TARGET_WIN32
 	#include "combaseapi.h"
 #endif
+
+using namespace std;
 
 namespace ofxCanon {
 #pragma mark CameraThread

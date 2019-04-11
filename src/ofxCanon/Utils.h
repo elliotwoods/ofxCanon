@@ -77,16 +77,16 @@ namespace ofxCanon {
 	//--
 
 	float rationalToFloat(EdsRational);
-	shared_ptr<ofBuffer> getBuffer(EdsStreamRef);
+	std::shared_ptr<ofBuffer> getBuffer(EdsStreamRef);
 
 	class FramerateCounter {
 	public:
 		void update();
-		void addFrame(chrono::high_resolution_clock::time_point = chrono::high_resolution_clock::now());
+		void addFrame(std::chrono::high_resolution_clock::time_point = std::chrono::high_resolution_clock::now());
 		float getFrameRate() const;
 	protected:
-		queue<chrono::high_resolution_clock::time_point> frameTimes;
-		mutex frameTimesMutex;
+		std::queue<std::chrono::high_resolution_clock::time_point> frameTimes;
+		std::mutex frameTimesMutex;
 
 		float frameRate = 0.0f;
 	};

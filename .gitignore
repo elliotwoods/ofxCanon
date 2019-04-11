@@ -37,6 +37,7 @@ ipch/
 *.idb
 *.pch
 
+**/.vs/
 
 # VVVV backup files
 *~.xml

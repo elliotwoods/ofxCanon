@@ -2,6 +2,9 @@
 
 #include "Device.h"
 
+#include "ofTexture.h"
+
+#include <memory>
 #include <thread>
 #include <mutex>
 #include <condition_variable>
@@ -13,26 +16,26 @@ namespace ofxCanon {
 		struct CameraThread {
 			void lensChangeCallback(Device::LensInfo & lensInfo);
 
-			shared_ptr<Device> device;
+			std::shared_ptr<Device> device;
 			std::thread thread;
 
 
 			ofPixels photoLoad;
 			ofPixels photo;
 			bool photoIsNew = false;
-			mutex photoMutex;
+			std::mutex photoMutex;
 
 			ofPixels liveViewLoad;
 			ofPixels liveView;
 			bool liveViewIsNew = false;
-			mutex liveViewMutex;
+			std::mutex liveViewMutex;
 
-			future<Device::PhotoCaptureResult> futurePhoto;
+			std::future<Device::PhotoCaptureResult> futurePhoto;
 
 			bool lensIsNew = false;
 			bool closeThread = false;
 
-			queue<function<void()>> actionQueue;
+			std::queue<std::function<void()>> actionQueue;
 		};
 
 		//We directly mirror the interface of ofxEdsdk as of August 31st 2016, changes:
@@ -68,9 +71,9 @@ namespace ofxCanon {
 		bool isPhotoNew();
 		void drawPhoto(float x, float y);
 		void drawPhoto(float x, float y, float width, float height);
-		bool savePhoto(string filename); // .jpg only
-		ofPixels& getPhotoPixels();
-		ofTexture& getPhotoTexture();
+		bool savePhoto(std::string filename); // .jpg only
+		ofPixels & getPhotoPixels();
+		ofTexture & getPhotoTexture();
 
 		void beginMovieRecording();
 		void endMovieRecording();
@@ -80,13 +83,13 @@ namespace ofxCanon {
 
 		bool isLensNew() const;
 
-		shared_ptr<CameraThread> getCameraThread();
+		std::shared_ptr<CameraThread> getCameraThread();
 	protected:
 		int deviceId = 0;
 		int orientationMode = 0;
 		bool useLiveView = true;
 
-		shared_ptr<CameraThread> cameraThread;
+		std::shared_ptr<CameraThread> cameraThread;
 
 		ofPixels photoPixels;
 		ofTexture photoTexture;

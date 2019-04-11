@@ -2,6 +2,10 @@
 
 #include "Initializer.h"
 
+#include "ofImage.h"
+
+using namespace std;
+
 namespace ofxCanon {
 	//----------
 	Device::Device(EdsCameraRef camera) {
@@ -655,7 +659,7 @@ namespace ofxCanon {
 			, "Get camera count");
 
 		
-		for (int i = 0; i < cameraCount; i++) {
+		for (EdsUInt32 i = 0; i < cameraCount; i++) {
 			EdsCameraRef camera;
 			ERROR_GOTO_FAIL(EdsGetChildAtIndex(cameraList, 0, &camera)
 				, "Get the camera device");
