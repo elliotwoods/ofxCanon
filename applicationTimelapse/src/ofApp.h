@@ -14,6 +14,8 @@ public:
 
 	void takePhoto();
 	void newSession();
+	void compressMovie();
+	string getSessionFolder() const;
 
 	void keyPressed(int key);
 	void keyReleased(int key);

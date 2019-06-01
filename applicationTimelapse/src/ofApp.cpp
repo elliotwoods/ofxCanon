@@ -25,6 +25,10 @@ void ofApp::setup() {
 			this->parameters.photoIndex.set(0);
 		});
 
+		widgetsPanel->addButton("Compress movie", [this]() {
+			this->compressMovie();
+		});
+
 		widgetsPanel->addEditableValue<float>("Shutter time", [this]() {
 			return this->cameraDevice->getShutterSpeed();
 		}, [this](const string & valueString) {
@@ -210,6 +214,19 @@ void ofApp::newSession() {
 }
 
 //--------------------------------------------------------------
+void ofApp::compressMovie() {
+	auto sessionFolder = ofToDataPath(this->getSessionFolder(), true);
+	auto command = "ffmpeg -y -r 24 -start_number 0 -i \"" + sessionFolder + "/%6d.JPG\" -vf scale=1920:-2 -pix_fmt yuv420p -vcodec libx264 -crf 10 \"" + sessionFolder + ".mp4\"";
+	ofSystem(command);
+	cout << command << endl;
+}
+
+//--------------------------------------------------------------
+string ofApp::getSessionFolder() const {
+	return "Sessions/" + this->parameters.sessionName.get();
+}
+
+//--------------------------------------------------------------
 void ofApp::keyPressed(int key) {
 
 }
@@ -270,7 +287,7 @@ void ofApp::callbackPhotoReceived(ofxCanon::Device::PhotoCaptureResult & photoRe
 		if (this->parameters.downloadPhoto) {
 			ofLoadImage(this->preview.getPixels(), *photoResult.encodedBuffer);
 
-			auto directoryName = "Sessions/" + this->parameters.sessionName.get();
+			auto directoryName = this->getSessionFolder();
 
 			//make directory if it doesn't exist
 			{
