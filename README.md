@@ -56,7 +56,7 @@ Check [instructions from ofxAddonLib](https://github.com/elliotwoods/ofxAddonLib
 
 # ofxEdsdk compatability 
 
-This addon carries on from [ofxEdsdk](https://github.com/kylemcdonald/ofxEdsdk) adding some features (although some may be missing).
+This addon began as a rewrite of the fantastic [ofxEdsdk](https://github.com/kylemcdonald/ofxEdsdk) by Kyle McDonald + adding some features (although some may be missing).
 
 Compatability with ofxEdsdk is provided by the `ofxCanon::Simple` class which has the same interface as `ofxEdsdk::Camera` (i.e. all the method names are the same and it should act as a drop-in replacement if you need it).
 
