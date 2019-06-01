@@ -22,18 +22,18 @@ namespace ofxCanon {
 				this->deviceInfo.port = string(deviceInfo.szPortName);
 			}
 
-			ERROR_GOTO_FAIL(EdsSetPropertyEventHandler(camera, kEdsPropertyEvent_All, Handlers::handlePropertyEvent, (EdsVoid *) this)
+			ERROR_GOTO_FAIL(EdsSetPropertyEventHandler(camera, kEdsPropertyEvent_All, Handlers::handlePropertyEvent, (EdsVoid *)this)
 				, "Set property event handler");
-			ERROR_GOTO_FAIL(EdsSetObjectEventHandler(camera, kEdsObjectEvent_All, Handlers::handleObjectEvent, (EdsVoid *) this)
+			ERROR_GOTO_FAIL(EdsSetObjectEventHandler(camera, kEdsObjectEvent_All, Handlers::handleObjectEvent, (EdsVoid *)this)
 				, "Set object event handler");
-			ERROR_GOTO_FAIL(EdsSetCameraStateEventHandler(camera, kEdsStateEvent_All, Handlers::handleStateEvent, (EdsVoid *) this)
+			ERROR_GOTO_FAIL(EdsSetCameraStateEventHandler(camera, kEdsStateEvent_All, Handlers::handleStateEvent, (EdsVoid *)this)
 				, "Set state event handler");
 		}
 
 		this->parameters.ISO.addListener(this, &Device::callbackISOParameterChanged);
 		this->parameters.aperture.addListener(this, &Device::callbackApertureParameterChanged);
 		this->parameters.shutterSpeed.addListener(this, &Device::callbackShutterSpeedParameterChanged);
-		
+
 	fail:
 		return;
 	}
@@ -45,6 +45,11 @@ namespace ofxCanon {
 		if (this->camera != NULL) {
 			EdsRelease(this->camera);
 		}
+	}
+
+	//----------
+	EdsCameraRef & Device::getRawCamera() {
+		return this->camera;
 	}
 
 	//----------
@@ -157,6 +162,21 @@ namespace ofxCanon {
 	}
 
 	//----------
+	void Device::takePhotoToMemoryCard() const {
+		//Set the save-to location to camera
+		{
+			EdsUInt32 saveTo = kEdsSaveTo_Camera;
+			ERROR_GOTO_FAIL(EdsSetPropertyData(this->camera, kEdsPropID_SaveTo, 0, sizeof(saveTo), &saveTo)
+				, "Set save to camera");
+		}
+
+		EdsSendCommand(this->camera, kEdsCameraCommand_TakePicture, 0);
+
+	fail:
+		return;
+	}
+
+	//----------
 	bool Device::getLiveView(ofPixels & pixels) const {
 		try {
 			if (!this->liveViewEnabled) {
@@ -184,8 +204,8 @@ namespace ofxCanon {
 			}
 
 			auto buffer = getBuffer(encodedStream);
-			
-			ofLoadImage(pixels, * buffer);
+
+			ofLoadImage(pixels, *buffer);
 
 			ERROR_THROW(EdsRelease(encodedStream)
 				, "Release live view stream");
@@ -235,7 +255,7 @@ namespace ofxCanon {
 
 		return optionsStrings;
 	}
-	
+
 	//----------
 	bool Device::getLogDeviceCallbacks() const {
 		return this->logDeviceCallbacks;
@@ -283,7 +303,22 @@ namespace ofxCanon {
 	}
 
 	//----------
+	void Device::setDownloadEnabled(bool downloadEnabled) {
+		this->downloadEnabled = downloadEnabled;
+	}
+
+	//----------
+	bool Device::getDownloadEnabled() const {
+		return this->downloadEnabled;
+	}
+
+	//----------
 	void Device::download(EdsDirectoryItemRef directoryItem) {
+		if (!this->downloadEnabled) {
+			// e.g. just save to memory card
+			return;
+		}
+
 		PhotoCaptureResult photoCaptureAsyncResult;
 		try {
 			EdsDirectoryItemInfo directoryItemInfo;
@@ -337,20 +372,21 @@ namespace ofxCanon {
 			ERROR_THROW(EdsRelease(encodedStream)
 				, "Release encoded stream");
 
-            photoCaptureAsyncResult.errorReturned = EDS_ERR_OK;
-            photoCaptureAsyncResult.encodedBuffer = buffer;
-            photoCaptureAsyncResult.metaData = metaData;
-            
+			photoCaptureAsyncResult.errorReturned = EDS_ERR_OK;
+			photoCaptureAsyncResult.encodedBuffer = buffer;
+			photoCaptureAsyncResult.metaData = metaData;
+
 			//if we've got an async listener waiting for a photo
 			if (this->capturePromise) {
-                this->hasDownloadedFirstPhoto = true;
-                this->captureStatus = CaptureStatus::CaptureSucceeded;
-                
-                this->capturePromise->set_value(photoCaptureAsyncResult);
-                this->capturePromise.reset();
-            } else {
-                this->onUnrequestedPhotoReceived.notify(this, photoCaptureAsyncResult);
-            }
+				this->hasDownloadedFirstPhoto = true;
+				this->captureStatus = CaptureStatus::CaptureSucceeded;
+
+				this->capturePromise->set_value(photoCaptureAsyncResult);
+				this->capturePromise.reset();
+			}
+			else {
+				this->onUnrequestedPhotoReceived.notify(this, photoCaptureAsyncResult);
+			}
 		}
 		catch (EdsError error) {
 			this->captureStatus = CaptureStatus::CaptureFailed;
@@ -358,9 +394,9 @@ namespace ofxCanon {
 			//if we've got an async listener waiting for a photo
 			if (this->capturePromise) {
 				photoCaptureAsyncResult.errorReturned = error;
-                
-                this->capturePromise->set_value(photoCaptureAsyncResult);
-                this->capturePromise.reset();
+
+				this->capturePromise->set_value(photoCaptureAsyncResult);
+				this->capturePromise.reset();
 			}
 		}
 	}
@@ -368,7 +404,7 @@ namespace ofxCanon {
 	//----------
 	void Device::lensChanged() {
 		auto lensStatus = this->getProperty<EdsUInt32>(kEdsPropID_LensStatus);
-		
+
 		if (lensStatus == 0) {
 			//no lens present
 			if (this->lensInfo.lensAttached) {
@@ -658,7 +694,7 @@ namespace ofxCanon {
 		ERROR_GOTO_FAIL(EdsGetChildCount(cameraList, &cameraCount)
 			, "Get camera count");
 
-		
+
 		for (EdsUInt32 i = 0; i < cameraCount; i++) {
 			EdsCameraRef camera;
 			ERROR_GOTO_FAIL(EdsGetChildAtIndex(cameraList, 0, &camera)
