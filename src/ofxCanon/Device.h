@@ -27,7 +27,8 @@ namespace ofxCanon {
 		from that thread (e.g. in your update loop if you're using your main thread).
 
 		Often you will want to wrap this class in something which handles threading
-		and presents images to the screen in textures.
+		and presents images to the screen in textures (e.g. the ofxCanon::Simple class does this
+		for you).
 	*/
 	class Device {
 	public:
