@@ -30,7 +30,7 @@ This addon is tested with:
 
 ### 2020.03.10
 
-Commit #[6b1b18b](https://github.com/elliotwoods/ofxCanon/commit/6b1b18b3edada5cfd52796f748429901da5eeb4d)
+Commit #[1b28a71](https://github.com/elliotwoods/ofxCanon/commit/6b1b18b3edada5cfd52796f748429901da5eeb4d)
 
 | IDE / Platform | EDSDK v.    | Camera  | Machine  | Success | 
 |----------------|-------------|---------|----------|---------|
