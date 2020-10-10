@@ -38,6 +38,7 @@ Commit #[6b1b18b](https://github.com/elliotwoods/ofxCanon/commit/6b1b18b3edada5c
 | VS2015         | 3.5.0    | EOS550D | x86, x64 | YES     |
 | XCode          | 3.5.0    | EOS100D | x86, x64 | YES     |
 | XCode          | 3.5.0    | EOS550D | x86, x64 | YES     |
+| XCode          | 3.9.0    | EOS1DX  | x86, x64 | [YES](https://github.com/elliotwoods/ofxCanon/issues/8#issuecomment-706388906)     |
 
 # Usage
 
