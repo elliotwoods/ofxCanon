@@ -32,10 +32,17 @@ This addon is tested with:
 
 Commit #[1b28a71](https://github.com/elliotwoods/ofxCanon/commit/6b1b18b3edada5cfd52796f748429901da5eeb4d)
 
+
 | IDE / Platform | EDSDK v.    | Camera  | Machine  | Success | 
 |----------------|-------------|---------|----------|---------|
 | VS2017         | 13.12.10    | EOS7D   | x86, x64 | YES     |
 | VS2017         | 13.12.10    | EOS750D | x86, x64 | YES     |
+| VS2017         | 13.12.10    | EOSM50 | x86, x64 | YES     |
+| VS2015         | 3.5.0    | EOS100D | x86, x64 | YES     |
+| VS2015         | 3.5.0    | EOS550D | x86, x64 | YES     |
+| XCode          | 3.5.0    | EOS100D | x86, x64 | YES     |
+| XCode          | 3.5.0    | EOS550D | x86, x64 | YES     |
+| XCode          | 3.9.0    | EOS1DX  | x86, x64 | [YES](https://github.com/elliotwoods/ofxCanon/issues/8#issuecomment-706388906)     |
 
 # Usage
 
@@ -50,9 +57,9 @@ Optional : For 32-bit builds you can add the `DPP.framework` to your project if 
 
 ## Visual Studio
 
-Use the project generator.
+Check [instructions from ofxAddonLib](https://github.com/elliotwoods/ofxAddonLib#how-to-use-an-addon-which-uses-ofxaddonlib-pattern) or use the project generator.
 
-# ofxEdsdk compatability 
+# ofxEdsdk compatibility 
 
 This addon began as a rewrite of the fantastic [ofxEdsdk](https://github.com/kylemcdonald/ofxEdsdk) by Kyle McDonald + adding some features (although some may be missing).
 
