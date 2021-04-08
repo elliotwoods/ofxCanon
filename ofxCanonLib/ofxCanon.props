@@ -8,6 +8,9 @@
       <PreprocessorDefinitions>HAS_OFXCANON;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\..\addons\ofxCanon\libs\EDSDK\include;..\..\..\addons\ofxCanon\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(OF_ROOT)addons\ofxCanon\libs\EDSDK\lib\vs\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup />
 </Project>
