@@ -7,6 +7,8 @@ namespace ofxCanon {
 
 		Initializer();
 		~Initializer();
+		
+		void init();
 
 		bool isInitialized() const;
 	protected:
