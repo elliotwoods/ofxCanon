@@ -22,12 +22,12 @@ namespace ofxCanon {
 		switch (propertyID) {
 			// Camera Settings Properties
 			CASE_RETURN(kEdsPropID, Unknown);
+			CASE_RETURN(kEdsPropID, ProductName);
 			CASE_RETURN(kEdsPropID, OwnerName);
 			CASE_RETURN(kEdsPropID, MakerName);
 			CASE_RETURN(kEdsPropID, DateTime);
 			CASE_RETURN(kEdsPropID, FirmwareVersion);
 			CASE_RETURN(kEdsPropID, BatteryLevel);
-			CASE_RETURN(kEdsPropID, CFn);
 			CASE_RETURN(kEdsPropID, SaveTo);
 			CASE_RETURN(kEdsPropID, CurrentStorage);
 			CASE_RETURN(kEdsPropID, CurrentFolder);
@@ -36,6 +36,8 @@ namespace ofxCanon {
 
 			CASE_RETURN(kEdsPropID, BodyIDEx);
 			CASE_RETURN(kEdsPropID, HDDirectoryStructure);
+
+			CASE_RETURN(kEdsPropID, TempStatus);
 
 			// Image properties
 			CASE_RETURN(kEdsPropID, ImageQuality);

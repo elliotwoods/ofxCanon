@@ -36,6 +36,7 @@ Commit #[1b28a71](https://github.com/elliotwoods/ofxCanon/commit/6b1b18b3edada5c
 
 | IDE / Platform | EDSDK v.    | Camera  | Machine  | Success | 
 |----------------|-------------|---------|----------|---------|
+| VS2019         | 13.12.31    | EOS5DMkiii   | x86, x64 | YES     |
 | VS2017         | 13.12.10    | EOS7D   | x86, x64 | YES     |
 | VS2017         | 13.12.10    | EOS750D | x86, x64 | YES     |
 | VS2017         | 13.12.10    | EOSM50 | x86, x64 | YES     |
@@ -44,6 +45,11 @@ Commit #[1b28a71](https://github.com/elliotwoods/ofxCanon/commit/6b1b18b3edada5c
 | XCode          | 3.5.0    | EOS100D | x86, x64 | YES     |
 | XCode          | 3.5.0    | EOS550D | x86, x64 | YES     |
 | XCode          | 3.9.0    | EOS1DX  | x86, x64 | [YES](https://github.com/elliotwoods/ofxCanon/issues/8#issuecomment-706388906)     |
+
+Note :
+
+1. More recent version of ofxCanon will break compatability with older versions of EDSDSK
+2. If you want to use earlier versions of EDSDK, then you will want to roll back to earlier versions of ofxCanon also (since there are breaking changes in the EDSDK API that we have to keep up to date with). I suggest that you check through the commit history back in time to the point where the version of EDSDK that you want to use is the top of the list (the same goes for earlier version of oF).
 
 # Usage
 
