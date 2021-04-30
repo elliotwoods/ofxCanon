@@ -21,7 +21,8 @@ An openFrameworks addon for interfacing with Canon DSLR cameras.
 ## Requirements
 
 * openFrameworks 0.9.0 or later
-* You must download the EDSDK from Canon ([Canon Europe EDSDK download](http://www.didp.canon-europa.com), [Canon USA EDSDK download](http://consumer.usa.canon.com/cusa/support/consumer/eos_slr_camera_systems/eos_digital_slr_cameras/digital_rebel_xt?fileURL=ps_sdk_form&pageKeyCode=downloadLicense&id=0901e02480057a74_1&productOverviewCid=0901e0248003ce28&keycode=Sdk_Lic)).
+* You must download the EDSDK from Canon ([Canon Europe EDSDK download](https://developers.canon-europe.com/developers/s/camera), [Canon USA EDSDK download](http://consumer.usa.canon.com/cusa/support/consumer/eos_slr_camera_systems/eos_digital_slr_cameras/digital_rebel_xt?fileURL=ps_sdk_form&pageKeyCode=downloadLicense&id=0901e02480057a74_1&productOverviewCid=0901e0248003ce28&keycode=Sdk_Lic)). Check the text files in `ofxCanon/libs` for example file layouts.
+* (Optional : [ofxAddonLib](http://github.com/elliotwoods/ofxAddonLib) if you're using Visual Studio)
 
 
 ## Tested

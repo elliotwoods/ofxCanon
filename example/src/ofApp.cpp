@@ -25,9 +25,9 @@ void ofApp::draw(){
 		this->preview.draw(ofGetCurrentViewport());
 	}
 
-	if(this->device) {
-		stringstream status;
+	stringstream status;
 
+	if(this->device) {
 		status << this->device->getDeviceInfo().toString();
 		status << endl;
 
@@ -42,8 +42,12 @@ void ofApp::draw(){
 
 		status << "Press [SPACE] to take a photo" << endl;
 
-		ofDrawBitmapStringHighlight(status.str(), 30, 30, ofColor(200, 100, 100), ofColor::white);
 	}
+	else {
+		status << "No camera found";
+	}
+
+	ofDrawBitmapStringHighlight(status.str(), 30, 30, ofColor(200, 100, 100), ofColor::white);
 }
 
 //--------------------------------------------------------------
