@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31112.23
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "openframeworksLib", "..\..\..\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj", "{5837595D-ACA9-485C-8E76-729040CE4B0B}"
 EndProject
@@ -12,7 +12,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ofxSingleton", "..\..\ofxSi
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ofxPluginLib", "..\..\ofxPlugin\ofxPluginLib\ofxPluginLib.vcxproj", "{68B9239B-5AE6-45C0-B1CB-6FC6B58BB6EE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ofxCanonLib", "..\ofxCanonLib\ofxCanonLib.vcxproj", "{6891A0B0-AD9E-4042-909D-1B5FDB4A3E39}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ofxCanonLib", "..\ofxCanonLib\ofxCanonLib.vcxproj", "{B6EF2661-4D10-4DAE-B4CF-BD0A92EA864C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "exampleMachineVision", "exampleMachineVision.vcxproj", "{7FD42DF7-442E-479A-BA76-D0022F99702A}"
 EndProject
@@ -64,14 +64,14 @@ Global
 		{68B9239B-5AE6-45C0-B1CB-6FC6B58BB6EE}.Release|Win32.Build.0 = Release|Win32
 		{68B9239B-5AE6-45C0-B1CB-6FC6B58BB6EE}.Release|x64.ActiveCfg = Release|x64
 		{68B9239B-5AE6-45C0-B1CB-6FC6B58BB6EE}.Release|x64.Build.0 = Release|x64
-		{6891A0B0-AD9E-4042-909D-1B5FDB4A3E39}.Debug|Win32.ActiveCfg = Debug|Win32
-		{6891A0B0-AD9E-4042-909D-1B5FDB4A3E39}.Debug|Win32.Build.0 = Debug|Win32
-		{6891A0B0-AD9E-4042-909D-1B5FDB4A3E39}.Debug|x64.ActiveCfg = Debug|x64
-		{6891A0B0-AD9E-4042-909D-1B5FDB4A3E39}.Debug|x64.Build.0 = Debug|x64
-		{6891A0B0-AD9E-4042-909D-1B5FDB4A3E39}.Release|Win32.ActiveCfg = Release|Win32
-		{6891A0B0-AD9E-4042-909D-1B5FDB4A3E39}.Release|Win32.Build.0 = Release|Win32
-		{6891A0B0-AD9E-4042-909D-1B5FDB4A3E39}.Release|x64.ActiveCfg = Release|x64
-		{6891A0B0-AD9E-4042-909D-1B5FDB4A3E39}.Release|x64.Build.0 = Release|x64
+		{B6EF2661-4D10-4DAE-B4CF-BD0A92EA864C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B6EF2661-4D10-4DAE-B4CF-BD0A92EA864C}.Debug|Win32.Build.0 = Debug|Win32
+		{B6EF2661-4D10-4DAE-B4CF-BD0A92EA864C}.Debug|x64.ActiveCfg = Debug|x64
+		{B6EF2661-4D10-4DAE-B4CF-BD0A92EA864C}.Debug|x64.Build.0 = Debug|x64
+		{B6EF2661-4D10-4DAE-B4CF-BD0A92EA864C}.Release|Win32.ActiveCfg = Release|Win32
+		{B6EF2661-4D10-4DAE-B4CF-BD0A92EA864C}.Release|Win32.Build.0 = Release|Win32
+		{B6EF2661-4D10-4DAE-B4CF-BD0A92EA864C}.Release|x64.ActiveCfg = Release|x64
+		{B6EF2661-4D10-4DAE-B4CF-BD0A92EA864C}.Release|x64.Build.0 = Release|x64
 		{7FD42DF7-442E-479A-BA76-D0022F99702A}.Debug|Win32.ActiveCfg = Debug|Win32
 		{7FD42DF7-442E-479A-BA76-D0022F99702A}.Debug|Win32.Build.0 = Debug|Win32
 		{7FD42DF7-442E-479A-BA76-D0022F99702A}.Debug|x64.ActiveCfg = Debug|x64
@@ -83,5 +83,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F21971C2-1836-4C65-A20F-8397A7E91915}
 	EndGlobalSection
 EndGlobal

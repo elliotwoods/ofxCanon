@@ -77,7 +77,6 @@ namespace ofxCanon {
 				ofAddListener(this->cameraThread->device->onLensChange, this->cameraThread.get(), &CameraThread::lensChangeCallback);
 
 				while (!this->cameraThread->closeThread) {
-
 					//receive incoming photo
 					if (this->cameraThread->futurePhoto.valid()) {
 						if (this->cameraThread->futurePhoto.wait_for(chrono::milliseconds(1)) == future_status::ready) {

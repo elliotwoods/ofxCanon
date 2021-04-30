@@ -361,9 +361,9 @@ namespace ofxCanon {
 					ERROR_THROW(EdsGetPropertyData(imageRef, kEdsPropID_FocalLength, 0, sizeof(EdsRational) * 3, value.data())
 						, "Get focal length data from image");
 					metaData = make_shared<PhotoMetadata>();
-					metaData->focalLength.minimumFocalLength = rationalToFloat(value[2]);
+					metaData->focalLength.minimumFocalLength = rationalToFloat(value[1]);
 					metaData->focalLength.currentFocalLength = rationalToFloat(value[0]);
-					metaData->focalLength.maximumFocalLength = rationalToFloat(value[1]);
+					metaData->focalLength.maximumFocalLength = rationalToFloat(value[2]);
 
 					ERROR_THROW(EdsRelease(imageRef)
 						, "Release downloaded image");
