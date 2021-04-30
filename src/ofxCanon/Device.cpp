@@ -335,8 +335,13 @@ namespace ofxCanon {
 					, "Download directory item");
 				ERROR_THROW(EdsDownloadComplete(directoryItem)
 					, "Download complete");
-				WARNING(EdsDeleteDirectoryItem(directoryItem)
-					, "Delete directory item");
+				
+				// NOTE: Using EDSDK 13.12.1 Using EdsDeleteDirectoryItem on an in memory 
+				// item first hang the camera for several seconds and then crashed the live view
+				// following the reference document/pdf a DeleteDirectory item is not needed (at least)
+				// it is not mentioned in the document (also not as change from previous API versions)
+				//WARNING(EdsDeleteDirectoryItem(directoryItem)
+				//	, "Delete directory item");
 			}
 
 			// NOTE : The Canon SDK does not provide decoding of RAW images for all its cameras, especially in 64bit
