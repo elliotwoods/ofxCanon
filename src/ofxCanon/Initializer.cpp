@@ -9,7 +9,6 @@ namespace ofxCanon {
 	//----------
 	Initializer & Initializer::X() {
 		static auto instance = std::make_unique<Initializer>();
-		instance->init();
 		return *instance;
 	}
 
@@ -20,7 +19,7 @@ namespace ofxCanon {
 
 	//----------
 	Initializer::Initializer() {
-
+		this->init();
 	}
 
 	//----------
