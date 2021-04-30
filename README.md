@@ -24,16 +24,21 @@ An openFrameworks addon for interfacing with Canon DSLR cameras.
 * You must download the EDSDK from Canon ([Canon Europe EDSDK download](https://developers.canon-europe.com/developers/s/camera), [Canon USA EDSDK download](http://consumer.usa.canon.com/cusa/support/consumer/eos_slr_camera_systems/eos_digital_slr_cameras/digital_rebel_xt?fileURL=ps_sdk_form&pageKeyCode=downloadLicense&id=0901e02480057a74_1&productOverviewCid=0901e0248003ce28&keycode=Sdk_Lic)). Check the text files in `ofxCanon/libs` for example file layouts.
 * (Optional : [ofxAddonLib](http://github.com/elliotwoods/ofxAddonLib) if you're using Visual Studio)
 
-## Tested
+
+## Tested
 
 This addon is tested with:
 
-### 2016.11.04
+### 2020.03.10
 
-Commit #[6b1b18b](https://github.com/elliotwoods/ofxCanon/commit/6b1b18b3edada5cfd52796f748429901da5eeb4d)
+Commit #[1b28a71](https://github.com/elliotwoods/ofxCanon/commit/6b1b18b3edada5cfd52796f748429901da5eeb4d)
 
-| IDE / Platform | EDSDK v. | Camera  | Machine  | Success | 
-|----------------|----------|---------|----------|---------|
+
+| IDE / Platform | EDSDK v.    | Camera  | Machine  | Success | 
+|----------------|-------------|---------|----------|---------|
+| VS2017         | 13.12.10    | EOS7D   | x86, x64 | YES     |
+| VS2017         | 13.12.10    | EOS750D | x86, x64 | YES     |
+| VS2017         | 13.12.10    | EOSM50 | x86, x64 | YES     |
 | VS2015         | 3.5.0    | EOS100D | x86, x64 | YES     |
 | VS2015         | 3.5.0    | EOS550D | x86, x64 | YES     |
 | XCode          | 3.5.0    | EOS100D | x86, x64 | YES     |
@@ -53,9 +58,9 @@ Optional : For 32-bit builds you can add the `DPP.framework` to your project if 
 
 ## Visual Studio
 
-Check [instructions from ofxAddonLib](https://github.com/elliotwoods/ofxAddonLib#how-to-use-an-addon-which-uses-ofxaddonlib-pattern).
+Check [instructions from ofxAddonLib](https://github.com/elliotwoods/ofxAddonLib#how-to-use-an-addon-which-uses-ofxaddonlib-pattern) or use the project generator.
 
-# ofxEdsdk compatability 
+# ofxEdsdk compatibility 
 
 This addon began as a rewrite of the fantastic [ofxEdsdk](https://github.com/kylemcdonald/ofxEdsdk) by Kyle McDonald + adding some features (although some may be missing).
 

@@ -31,7 +31,6 @@ namespace ofxCanon {
 			CASE_RETURN(kEdsPropID, SaveTo);
 			CASE_RETURN(kEdsPropID, CurrentStorage);
 			CASE_RETURN(kEdsPropID, CurrentFolder);
-			CASE_RETURN(kEdsPropID, MyMenu);
 
 			CASE_RETURN(kEdsPropID, BatteryQuality);
 
@@ -40,33 +39,16 @@ namespace ofxCanon {
 
 			// Image properties
 			CASE_RETURN(kEdsPropID, ImageQuality);
-			CASE_RETURN(kEdsPropID, JpegQuality);
 			CASE_RETURN(kEdsPropID, Orientation);
 			CASE_RETURN(kEdsPropID, ICCProfile);
 			CASE_RETURN(kEdsPropID, FocusInfo);
-			CASE_RETURN(kEdsPropID, DigitalExposure);
 			CASE_RETURN(kEdsPropID, WhiteBalance);
 			CASE_RETURN(kEdsPropID, ColorTemperature);
 			CASE_RETURN(kEdsPropID, WhiteBalanceShift);
-			CASE_RETURN(kEdsPropID, Contrast);
-			CASE_RETURN(kEdsPropID, ColorSaturation);
-			CASE_RETURN(kEdsPropID, ColorTone);
-			CASE_RETURN(kEdsPropID, Sharpness);
 			CASE_RETURN(kEdsPropID, ColorSpace);
-			CASE_RETURN(kEdsPropID, ToneCurve);
-			CASE_RETURN(kEdsPropID, PhotoEffect);
-			CASE_RETURN(kEdsPropID, FilterEffect);
-			CASE_RETURN(kEdsPropID, ToningEffect);
-			CASE_RETURN(kEdsPropID, ParameterSet);
-			CASE_RETURN(kEdsPropID, ColorMatrix);
 			CASE_RETURN(kEdsPropID, PictureStyle);
 			CASE_RETURN(kEdsPropID, PictureStyleDesc);
 			CASE_RETURN(kEdsPropID, PictureStyleCaption);
-
-			// Image Processing Properties
-			CASE_RETURN(kEdsPropID, Linear);
-			CASE_RETURN(kEdsPropID, ClickWBPoint);
-			CASE_RETURN(kEdsPropID, WBCoeffs);
 
 			// Image GPS Properties
 			CASE_RETURN(kEdsPropID, GPSVersionID);
@@ -82,9 +64,6 @@ namespace ofxCanon {
 			CASE_RETURN(kEdsPropID, GPSMapDatum);
 			CASE_RETURN(kEdsPropID, GPSDateStamp);
 
-			// Property Mask
-			CASE_RETURN(kEdsPropID, AtCapture_Flag);
-
 			// Capture Properties
 			CASE_RETURN(kEdsPropID, AEMode);
 			CASE_RETURN(kEdsPropID, DriveMode);
@@ -94,7 +73,6 @@ namespace ofxCanon {
 			CASE_RETURN(kEdsPropID, Av);
 			CASE_RETURN(kEdsPropID, Tv);
 			CASE_RETURN(kEdsPropID, ExposureCompensation);
-			CASE_RETURN(kEdsPropID, FlashCompensation);
 			CASE_RETURN(kEdsPropID, FocalLength);
 			CASE_RETURN(kEdsPropID, AvailableShots);
 			CASE_RETURN(kEdsPropID, Bracket);
@@ -110,9 +88,8 @@ namespace ofxCanon {
 			CASE_RETURN(kEdsPropID, LensStatus);
 			CASE_RETURN(kEdsPropID, Artist);
 			CASE_RETURN(kEdsPropID, Copyright);
-			CASE_RETURN(kEdsPropID, DepthOfField);
-			CASE_RETURN(kEdsPropID, EFCompensation);
 			CASE_RETURN(kEdsPropID, AEModeSelect);
+			CASE_RETURN(kEdsPropID, PowerZoom_Speed);
 
 			// EVF Properties
 			CASE_RETURN(kEdsPropID, Evf_OutputDevice);
@@ -124,7 +101,6 @@ namespace ofxCanon {
 			// EVF IMAGE DATA Properties
 			CASE_RETURN(kEdsPropID, Evf_Zoom);
 			CASE_RETURN(kEdsPropID, Evf_ZoomPosition);
-			CASE_RETURN(kEdsPropID, Evf_FocusAid);
 			CASE_RETURN(kEdsPropID, Evf_Histogram);
 			CASE_RETURN(kEdsPropID, Evf_ImagePosition);
 			CASE_RETURN(kEdsPropID, Evf_HistogramStatus);
@@ -140,6 +116,10 @@ namespace ofxCanon {
 			CASE_RETURN(kEdsPropID, Evf_CoordinateSystem);
 			CASE_RETURN(kEdsPropID, Evf_ZoomRect);
 			CASE_RETURN(kEdsPropID, Evf_ImageClipRect);
+
+			CASE_RETURN(kEdsPropID, Evf_PowerZoom_CurPosition);
+			CASE_RETURN(kEdsPropID, Evf_PowerZoom_MaxPosition);
+			CASE_RETURN(kEdsPropID, Evf_PowerZoom_MinPosition);
 
 		default:
 			return "Unknown";
@@ -328,6 +308,8 @@ namespace ofxCanon {
 			CASE_RETURN(kEdsCameraCommand, DoClickWBEvf);
 
 			CASE_RETURN(kEdsCameraCommand, PressShutterButton);
+			CASE_RETURN(kEdsCameraCommand, DrivePowerZoom);
+			CASE_RETURN(kEdsCameraCommand, SetRemoteShootingMode);
 
 		default:
 			return "Unknown";

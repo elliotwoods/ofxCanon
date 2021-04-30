@@ -9,6 +9,7 @@ namespace ofxCanon {
 	//----------
 	Initializer & Initializer::X() {
 		static auto instance = std::make_unique<Initializer>();
+		instance->init();
 		return *instance;
 	}
 
@@ -19,14 +20,7 @@ namespace ofxCanon {
 
 	//----------
 	Initializer::Initializer() {
-		auto error = EdsInitializeSDK();
-		if (error != EDS_ERR_OK) {
-			ofLogError("ofxCanon") << "Failed to initialize EDSDK";
-			this->initialized = false;
-		}
-		else {
-			this->initialized = true;
-		}
+
 	}
 
 	//----------
@@ -36,5 +30,21 @@ namespace ofxCanon {
 			ofLogError("ofxCanon") << "Failed to terminate EDSDK";
 		}
 		this->initialized = false;
+	}
+	
+	void Initializer::init()
+	{
+		if (this->initialized)
+		{
+			EdsTerminateSDK();
+		}
+		auto error = EdsInitializeSDK();
+		if (error != EDS_ERR_OK) {
+			ofLogError("ofxCanon") << "Failed to initialize EDSDK";
+			this->initialized = false;
+		}
+		else {
+			this->initialized = true;
+		}
 	}
 }
