@@ -328,6 +328,15 @@ namespace ofxMachineVision {
 						cv::dilate(bluePlane, bluePlane, boxKernel);
 					}
 
+					//blur the color planes
+					{
+						auto blurRadius = this->customParameters.monoDebayerBlurSize->getParameterTyped<int>()->get();
+						auto blurSize = cv::Size(blurRadius, blurRadius);
+						cv::blur(redPlane, redPlane, blurSize);
+						cv::blur(greenPlane, greenPlane, blurSize);
+						cv::blur(bluePlane, bluePlane, blurSize);
+					}
+
 					//promote resolution to float for each plane
 					cv::Mat redPlaneFloat, greenPlaneFloat, bluePlaneFloat;
 					{
@@ -341,14 +350,6 @@ namespace ofxMachineVision {
 					{
 						redFactor = greenPlaneFloat / redPlaneFloat;
 						blueFactor = greenPlaneFloat / bluePlaneFloat;
-					}
-
-					//blue the factor planes
-					{
-						auto blurRadius = this->customParameters.monoDebayerBlurSize->getParameterTyped<int>()->get();
-						auto blurSize = cv::Size(blurRadius, blurRadius);
-						cv::blur(redFactor, redFactor, blurSize);
-						cv::blur(blueFactor, blueFactor, blurSize);
 					}
 
 					//mask copy the factors back into a combined factor plane
