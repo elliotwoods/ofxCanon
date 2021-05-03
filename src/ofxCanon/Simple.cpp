@@ -297,6 +297,11 @@ namespace ofxCanon {
 	}
 
 	//----------
+	const Device::PhotoCaptureResult& Simple::getPhotoCaptureResult() const {
+		return this->photoCaptureResult;
+	}
+
+	//----------
 	void Simple::beginMovieRecording() {
 		// Currently unsupported sorry
 	}
@@ -340,11 +345,8 @@ namespace ofxCanon {
 	//----------
 	void Simple::processCaptureResult(const Device::PhotoCaptureResult& photoCaptureResult) {
 		if (photoCaptureResult.errorReturned == EDS_ERR_OK) {
-			ofImageLoadSettings imageLoadSettings;
-			
 			ofLoadImage(this->cameraThread->photoLoad
-				, *photoCaptureResult.encodedBuffer
-			, );
+				, *photoCaptureResult.encodedBuffer);
 
 			//(rotate) and swap it into the chain
 			{
@@ -356,6 +358,8 @@ namespace ofxCanon {
 				swap(this->cameraThread->photoLoad, this->cameraThread->photo);
 				this->cameraThread->photoIsNew = true;
 			}
+
+			this->photoCaptureResult = photoCaptureResult;
 		}
 		else {
 			ofLogError("ofxCanon") << "Photo capture failed : " << errorToString(photoCaptureResult.errorReturned);

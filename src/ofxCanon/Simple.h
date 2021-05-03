@@ -74,6 +74,8 @@ namespace ofxCanon {
 		ofPixels & getPhotoPixels();
 		ofTexture & getPhotoTexture();
 
+		const Device::PhotoCaptureResult& getPhotoCaptureResult() const;
+
 		void beginMovieRecording();
 		void endMovieRecording();
 		bool isMovieNew();
@@ -103,5 +105,7 @@ namespace ofxCanon {
 		FramerateCounter liveViewFramerateCounter;
 
 		bool lensIsNew = false;
+
+		Device::PhotoCaptureResult photoCaptureResult;
 	};
 }

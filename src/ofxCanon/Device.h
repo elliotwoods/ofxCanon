@@ -77,7 +77,7 @@ namespace ofxCanon {
 		struct PhotoCaptureResult {
 			std::shared_ptr<ofBuffer> encodedBuffer;
 			std::shared_ptr<PhotoMetadata> metaData;
-			EdsError errorReturned;
+			EdsError errorReturned = EDS_ERR_OBJECT_NOTREADY;
 
 			operator bool() const {
 				return this->errorReturned == EDS_ERR_OK;

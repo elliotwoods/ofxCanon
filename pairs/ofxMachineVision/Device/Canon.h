@@ -26,6 +26,16 @@ namespace ofxMachineVision {
 			bool markFrameNew;
 			chrono::system_clock::time_point openTime;
 			shared_ptr<ofxCanon::Simple> camera;
+
+			struct {
+				shared_ptr<ofxMachineVision::Parameter<int>> iso;
+				shared_ptr<ofxMachineVision::Parameter<float>> aperture;
+				shared_ptr<ofxMachineVision::Parameter<float>> shutterSpeed;
+				shared_ptr<ofxMachineVision::Parameter<bool>> monoDebayerEnabled;
+				shared_ptr<ofxMachineVision::Parameter<int>> monoDebayerBlurSize;
+				shared_ptr<ofxMachineVision::Parameter<bool>> normalize;
+				shared_ptr<ofxMachineVision::Parameter<float>> normalizePercentile;
+			} customParameters;
 		};
 	}
 }

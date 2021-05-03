@@ -53,6 +53,7 @@
     <Import Project="..\..\..\addons\ofxCanon\ofxCanonLib\ofxCanon.props" />
     <Import Project="..\..\ofxMachineVision\ofxMachineVisionLib\ofxMachineVision.props" />
     <Import Project="..\..\ofxCvGui\ofxCvGuiLib\ofxCvGui.props" />
+    <Import Project="..\..\ofxCvMin\ofxCvMinLib\ofxCvMin.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -60,6 +61,7 @@
     <Import Project="..\..\..\addons\ofxCanon\ofxCanonLib\ofxCanon.props" />
     <Import Project="..\..\ofxMachineVision\ofxMachineVisionLib\ofxMachineVision.props" />
     <Import Project="..\..\ofxCvGui\ofxCvGuiLib\ofxCvGui.props" />
+    <Import Project="..\..\ofxCvMin\ofxCvMinLib\ofxCvMin.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -67,6 +69,7 @@
     <Import Project="..\..\..\addons\ofxCanon\ofxCanonLib\ofxCanon.props" />
     <Import Project="..\..\ofxMachineVision\ofxMachineVisionLib\ofxMachineVision.props" />
     <Import Project="..\..\ofxCvGui\ofxCvGuiLib\ofxCvGui.props" />
+    <Import Project="..\..\ofxCvMin\ofxCvMinLib\ofxCvMin.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -74,6 +77,7 @@
     <Import Project="..\..\..\addons\ofxCanon\ofxCanonLib\ofxCanon.props" />
     <Import Project="..\..\ofxMachineVision\ofxMachineVisionLib\ofxMachineVision.props" />
     <Import Project="..\..\ofxCvGui\ofxCvGuiLib\ofxCvGui.props" />
+    <Import Project="..\..\ofxCvMin\ofxCvMinLib\ofxCvMin.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
