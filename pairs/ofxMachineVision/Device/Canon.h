@@ -31,8 +31,9 @@ namespace ofxMachineVision {
 				shared_ptr<ofxMachineVision::Parameter<int>> iso;
 				shared_ptr<ofxMachineVision::Parameter<float>> aperture;
 				shared_ptr<ofxMachineVision::Parameter<float>> shutterSpeed;
+				shared_ptr<ofxMachineVision::Parameter<bool>> directRawEnabled;
 				shared_ptr<ofxMachineVision::Parameter<bool>> monoDebayerEnabled;
-				shared_ptr<ofxMachineVision::Parameter<int>> monoDebayerBlurSize;
+				shared_ptr<ofxMachineVision::Parameter<int>> monoDebayerDilateIterations;
 				shared_ptr<ofxMachineVision::Parameter<bool>> normalize;
 				shared_ptr<ofxMachineVision::Parameter<float>> normalizePercentile;
 			} customParameters;

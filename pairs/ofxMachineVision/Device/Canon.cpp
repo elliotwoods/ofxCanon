@@ -72,8 +72,9 @@ namespace ofxMachineVision {
 			this->customParameters.iso = make_shared<ofxMachineVision::Parameter<int>>(ofParameter<int>("ISO", 400));
 			this->customParameters.aperture = make_shared<ofxMachineVision::Parameter<float>>(ofParameter<float>("Aperture", 9, 0, 22));
 			this->customParameters.shutterSpeed = make_shared<ofxMachineVision::Parameter<float>>(ofParameter<float>("Shutter Speed", 1. / 30., 0, 60));
+			this->customParameters.directRawEnabled = make_shared<ofxMachineVision::Parameter<bool>>(ofParameter<bool>("Direct raw enabled", false));
 			this->customParameters.monoDebayerEnabled = make_shared<ofxMachineVision::Parameter<bool>>(ofParameter<bool>("Mono debayer enabled", false));
-			this->customParameters.monoDebayerBlurSize = make_shared<ofxMachineVision::Parameter<int>>(ofParameter<int>("Mono debayer blur size", 50));
+			this->customParameters.monoDebayerDilateIterations = make_shared<ofxMachineVision::Parameter<int>>(ofParameter<int>("Mono debayer dilations", 0));
 			this->customParameters.normalize = make_shared<ofxMachineVision::Parameter<bool>>(ofParameter<bool>("Normalize", false));
 			this->customParameters.normalizePercentile = make_shared<ofxMachineVision::Parameter<float>>(ofParameter<float>("Normalize %", 1, 0, 1));
 
@@ -83,8 +84,9 @@ namespace ofxMachineVision {
 					this->customParameters.iso
 					, this->customParameters.aperture
 					, this->customParameters.shutterSpeed
+					, this->customParameters.directRawEnabled
 					, this->customParameters.monoDebayerEnabled
-					, this->customParameters.monoDebayerBlurSize
+					, this->customParameters.monoDebayerDilateIterations
 					, this->customParameters.normalize
 					, this->customParameters.normalizePercentile
 				});
@@ -232,7 +234,7 @@ namespace ofxMachineVision {
 			}
 
 			// Standard capture
-			if (!this->customParameters.monoDebayerEnabled->getParameterTyped<bool>()->get()) {
+			if (!this->customParameters.directRawEnabled->getParameterTyped<bool>()->get()) {
 				frame = FramePool::X().getAvailableFrameFilledWith(this->camera->getPhotoPixels());
 
 				//normalize
@@ -264,7 +266,7 @@ namespace ofxMachineVision {
 				}
 
 				//perform the process of mono debayering based on neighborhood white balance
-				{
+				if (this->customParameters.monoDebayerEnabled->getParameterTyped<bool>()->get()) {
 					cv::Mat image = ofxCv::toCv(rawPixels);
 
 					auto width = rawPixels.getWidth();
@@ -328,13 +330,19 @@ namespace ofxMachineVision {
 						cv::dilate(bluePlane, bluePlane, boxKernel);
 					}
 
-					//blur the color planes
+					//take local maxima for the color planes
 					{
-						auto blurRadius = this->customParameters.monoDebayerBlurSize->getParameterTyped<int>()->get();
-						auto blurSize = cv::Size(blurRadius, blurRadius);
-						cv::blur(redPlane, redPlane, blurSize);
-						cv::blur(greenPlane, greenPlane, blurSize);
-						cv::blur(bluePlane, bluePlane, blurSize);
+						auto dilateIterations = this->customParameters.monoDebayerDilateIterations->getParameterTyped<int>()->get();
+						auto kernelSize = cv::Size(3, 3);
+						auto kernel = cv::getStructuringElement(cv::MORPH_RECT, kernelSize);
+						for (int i = 0; i < dilateIterations; i++) {
+							//cv::dilate(redPlane, redPlane, kernel);
+							//cv::dilate(greenPlane, greenPlane, kernel);
+							//cv::dilate(bluePlane, bluePlane, kernel);
+							cv::blur(redPlane, redPlane, kernelSize);
+							cv::blur(greenPlane, greenPlane, kernelSize);
+							cv::blur(bluePlane, bluePlane, kernelSize);
+						}
 					}
 
 					//promote resolution to float for each plane
@@ -367,10 +375,10 @@ namespace ofxMachineVision {
 						resultFloat = resultFloat.mul(factor);
 						resultFloat.convertTo(image, CV_16U);
 					}
-
-					// Note the raw pixels have been converted by this point:
-					frame = FramePool::X().getAvailableFrameFilledWith(rawPixels);
 				}
+
+				// Note the raw pixels have been converted by this point:
+				frame = FramePool::X().getAvailableFrameFilledWith(rawPixels);
 			}
 
 			//timestamp
