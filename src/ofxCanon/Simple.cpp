@@ -75,6 +75,7 @@ namespace ofxCanon {
 				}
 
 				ofAddListener(this->cameraThread->device->onLensChange, this->cameraThread.get(), &CameraThread::lensChangeCallback);
+				ofAddListener(this->cameraThread->device->onUnrequestedPhotoReceived, this, &Simple::callbackUnrequestedPhotoReceived);
 
 				while (!this->cameraThread->closeThread) {
 					//receive incoming photo
@@ -82,23 +83,15 @@ namespace ofxCanon {
 						if (this->cameraThread->futurePhoto.wait_for(chrono::milliseconds(1)) == future_status::ready) {
 							//photo has been received so load it
 							auto result = this->cameraThread->futurePhoto.get();
-							if (result.errorReturned == EDS_ERR_OK) {
-								ofLoadImage(this->cameraThread->photoLoad, *result.encodedBuffer);
+							this->processCaptureResult(result);
+						}
+					}
 
-								//(rotate) and swap it into the chain
-								{
-									if (this->orientationMode != 0) {
-										this->cameraThread->photoLoad.rotate90(this->orientationMode);
-									}
-
-									unique_lock<mutex> lock(this->cameraThread->photoMutex);
-									swap(this->cameraThread->photoLoad, this->cameraThread->photo);
-									this->cameraThread->photoIsNew = true;
-								}
-							}
-							else {
-								ofLogError("ofxCanon") << "Photo capture failed : " << errorToString(result.errorReturned);
-							}
+					//receive unrequested photos
+					{
+						Device::PhotoCaptureResult unrequestedPhoto;
+						while (this->unrequestedPhotosIncoming.tryReceive(unrequestedPhoto)) {
+							this->processCaptureResult(unrequestedPhoto);
 						}
 					}
 
@@ -192,12 +185,12 @@ namespace ofxCanon {
 	}
 
 	//----------
-	unsigned int Simple::getWidth() const {
+	size_t Simple::getWidth() const {
 		return this->liveViewPixels.getWidth();
 	}
 
 	//----------
-	unsigned int Simple::getHeight() const {
+	size_t Simple::getHeight() const {
 		return this->liveViewPixels.getHeight();
 	}
 
@@ -337,5 +330,35 @@ namespace ofxCanon {
 	//----------
 	shared_ptr<Simple::CameraThread> Simple::getCameraThread() {
 		return this->cameraThread;
+	}
+
+	//----------
+	void Simple::callbackUnrequestedPhotoReceived(Device::PhotoCaptureResult& photoCaptureResult) {
+		this->unrequestedPhotosIncoming.send(photoCaptureResult);
+	}
+
+	//----------
+	void Simple::processCaptureResult(const Device::PhotoCaptureResult& photoCaptureResult) {
+		if (photoCaptureResult.errorReturned == EDS_ERR_OK) {
+			ofImageLoadSettings imageLoadSettings;
+			
+			ofLoadImage(this->cameraThread->photoLoad
+				, *photoCaptureResult.encodedBuffer
+			, );
+
+			//(rotate) and swap it into the chain
+			{
+				if (this->orientationMode != 0) {
+					this->cameraThread->photoLoad.rotate90(this->orientationMode);
+				}
+
+				unique_lock<mutex> lock(this->cameraThread->photoMutex);
+				swap(this->cameraThread->photoLoad, this->cameraThread->photo);
+				this->cameraThread->photoIsNew = true;
+			}
+		}
+		else {
+			ofLogError("ofxCanon") << "Photo capture failed : " << errorToString(photoCaptureResult.errorReturned);
+		}
 	}
 }

@@ -45,7 +45,6 @@ namespace ofxCanon {
 		//Not supported:
 		// * getBandwidth
 		// * movie recording
-		// * taking photos using the camera button trigger
 
 		virtual ~Simple();
 
@@ -57,8 +56,8 @@ namespace ofxCanon {
 
 		void update();
 		bool isFrameNew();
-		unsigned int getWidth() const;
-		unsigned int getHeight() const;
+		size_t getWidth() const;
+		size_t getHeight() const;
 		bool isLiveDataReady() const;
 		void draw(float x, float y);
 		void draw(float x, float y, float width, float height);
@@ -85,11 +84,14 @@ namespace ofxCanon {
 
 		std::shared_ptr<CameraThread> getCameraThread();
 	protected:
+		void callbackUnrequestedPhotoReceived(Device::PhotoCaptureResult&);
+		void processCaptureResult(const Device::PhotoCaptureResult&);
 		int deviceId = 0;
 		int orientationMode = 0;
 		bool useLiveView = true;
 
 		std::shared_ptr<CameraThread> cameraThread;
+		ofThreadChannel<Device::PhotoCaptureResult> unrequestedPhotosIncoming;
 
 		ofPixels photoPixels;
 		ofTexture photoTexture;
