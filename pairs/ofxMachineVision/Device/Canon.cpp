@@ -74,7 +74,7 @@ namespace ofxMachineVision {
 			this->customParameters.shutterSpeed = make_shared<ofxMachineVision::Parameter<float>>(ofParameter<float>("Shutter Speed", 1. / 30., 0, 60));
 			this->customParameters.directRawEnabled = make_shared<ofxMachineVision::Parameter<bool>>(ofParameter<bool>("Direct raw enabled", false));
 			this->customParameters.monoDebayerEnabled = make_shared<ofxMachineVision::Parameter<bool>>(ofParameter<bool>("Mono debayer enabled", false));
-			this->customParameters.monoDebayerDilateIterations = make_shared<ofxMachineVision::Parameter<int>>(ofParameter<int>("Mono debayer dilations", 0));
+			this->customParameters.monoDebayerDilateIterations = make_shared<ofxMachineVision::Parameter<int>>(ofParameter<int>("Mono debayer dilations", 2));
 			this->customParameters.normalize = make_shared<ofxMachineVision::Parameter<bool>>(ofParameter<bool>("Normalize", false));
 			this->customParameters.normalizePercentile = make_shared<ofxMachineVision::Parameter<float>>(ofParameter<float>("Normalize %", 1, 0, 1));
 
