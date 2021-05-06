@@ -528,6 +528,8 @@ namespace ofxCanon {
 		default:
 			break;
 		}
+
+		ofNotifyEvent(this->onParameterOptionsChange, propertyID, this);
 	}
 
 	//----------

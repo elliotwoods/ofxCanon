@@ -16,6 +16,23 @@ namespace ofxCanon {
 		this->lensIsNew = true;
 	}
 
+	//----------
+	void Simple::CameraThread::parameterChangeCallback(EdsPropertyID& propertyID) {
+		switch (propertyID) {
+		case kEdsPropID_ISOSpeed:
+			this->ISOIsNew = true;
+			break;
+		case kEdsPropID_Av:
+			this->apertureIsNew = true;
+			break;
+		case kEdsPropID_Tv:
+			this->shutterSpeedIsNew = true;
+			break;
+		default:
+			break;
+		}
+	}
+
 #pragma mark Simple
 	//----------
 	Simple::~Simple() {
@@ -75,6 +92,7 @@ namespace ofxCanon {
 				}
 
 				ofAddListener(this->cameraThread->device->onLensChange, this->cameraThread.get(), &CameraThread::lensChangeCallback);
+				ofAddListener(this->cameraThread->device->onParameterOptionsChange, this->cameraThread.get(), &CameraThread::parameterChangeCallback);
 				ofAddListener(this->cameraThread->device->onUnrequestedPhotoReceived, this, &Simple::callbackUnrequestedPhotoReceived);
 
 				while (!this->cameraThread->closeThread) {
@@ -174,7 +192,14 @@ namespace ofxCanon {
 
 			{
 				this->lensIsNew = this->cameraThread->lensIsNew;
+				this->apertureIsNew = this->cameraThread->apertureIsNew;
+				this->ISOIsNew = this->cameraThread->ISOIsNew;
+				this->shutterSpeedIsNew = this->cameraThread->shutterSpeedIsNew;
+
 				this->cameraThread->lensIsNew = false;
+				this->cameraThread->apertureIsNew = false;
+				this->cameraThread->ISOIsNew = false;
+				this->cameraThread->shutterSpeedIsNew = false;
 			}
 		}
 	}
@@ -330,6 +355,21 @@ namespace ofxCanon {
 	//----------
 	bool Simple::isLensNew() const {
 		return this->lensIsNew;
+	}
+
+	//----------
+	bool Simple::isApertureNew() const {
+		return this->apertureIsNew;
+	}
+
+	//----------
+	bool Simple::isISONew() const {
+		return this->ISOIsNew;
+	}
+
+	//----------
+	bool Simple::isShutterSpeedNew() const {
+		return this->shutterSpeedIsNew;
 	}
 
 	//----------

@@ -212,6 +212,15 @@ namespace ofxMachineVision {
 		//----------
 		void Canon::updateIsFrameNew() {
 			this->camera->update();
+			if (this->camera->isISONew()) {
+				this->customParameters.iso->syncFromDevice();
+			}
+			if (this->camera->isApertureNew()) {
+				this->customParameters.aperture->syncFromDevice();
+			}
+			if (this->camera->isShutterSpeedNew()) {
+				this->customParameters.shutterSpeed->syncFromDevice();
+			}
 		}
 
 		//----------

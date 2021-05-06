@@ -14,7 +14,8 @@ namespace ofxCanon {
 	class Simple {
 	public:
 		struct CameraThread {
-			void lensChangeCallback(Device::LensInfo & lensInfo);
+			void lensChangeCallback(Device::LensInfo& lensInfo);
+			void parameterChangeCallback(EdsPropertyID&);
 
 			std::shared_ptr<Device> device;
 			std::thread thread;
@@ -33,6 +34,10 @@ namespace ofxCanon {
 			std::future<Device::PhotoCaptureResult> futurePhoto;
 
 			bool lensIsNew = false;
+			bool apertureIsNew = false;
+			bool ISOIsNew = false;
+			bool shutterSpeedIsNew = false;
+
 			bool closeThread = false;
 
 			std::queue<std::function<void()>> actionQueue;
@@ -83,6 +88,9 @@ namespace ofxCanon {
 		bool isConnected();
 
 		bool isLensNew() const;
+		bool isApertureNew() const;
+		bool isISONew() const;
+		bool isShutterSpeedNew() const;
 
 		std::shared_ptr<CameraThread> getCameraThread();
 	protected:
@@ -105,6 +113,9 @@ namespace ofxCanon {
 		FramerateCounter liveViewFramerateCounter;
 
 		bool lensIsNew = false;
+		bool apertureIsNew = false;
+		bool ISOIsNew = false;
+		bool shutterSpeedIsNew = false;
 
 		Device::PhotoCaptureResult photoCaptureResult;
 	};
