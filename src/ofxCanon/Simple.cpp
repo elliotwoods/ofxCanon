@@ -87,15 +87,14 @@ namespace ofxCanon {
 
 			//in this thread, start operating the camera
 			if (success) {
-				if (this->useLiveView) {
-					this->cameraThread->device->setLiveViewEnabled(true);
-				}
-
 				ofAddListener(this->cameraThread->device->onLensChange, this->cameraThread.get(), &CameraThread::lensChangeCallback);
 				ofAddListener(this->cameraThread->device->onParameterOptionsChange, this->cameraThread.get(), &CameraThread::parameterChangeCallback);
 				ofAddListener(this->cameraThread->device->onUnrequestedPhotoReceived, this, &Simple::callbackUnrequestedPhotoReceived);
 
 				while (!this->cameraThread->closeThread) {
+					auto useLiveView = this->useLiveView;
+					this->cameraThread->device->setLiveViewEnabled(useLiveView);
+
 					//receive incoming photo
 					if (this->cameraThread->futurePhoto.valid()) {
 						if (this->cameraThread->futurePhoto.wait_for(chrono::milliseconds(1)) == future_status::ready) {
@@ -117,7 +116,7 @@ namespace ofxCanon {
 					this->cameraThread->device->update();
 
 					//grab live view frame
-					if (this->useLiveView) {
+					if (useLiveView) {
 						if (this->cameraThread->device->getLiveView(this->cameraThread->liveViewLoad)) {
 							if (this->orientationMode != 0) {
 								this->cameraThread->liveView.rotate90(this->orientationMode);

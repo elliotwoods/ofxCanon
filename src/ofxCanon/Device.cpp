@@ -670,6 +670,11 @@ namespace ofxCanon {
 
 	//----------
 	void Device::setLiveViewEnabled(bool liveViewEnabled, bool enableCameraScreen) {
+		// Don't perform if state is same as what we've already set
+		if (liveViewEnabled == this->liveViewEnabled) {
+			return;
+		}
+
 		{
 			EdsUInt32 evfMode = liveViewEnabled ? 1 : 0;
 			this->setProperty(kEdsPropID_Evf_Mode, evfMode);
@@ -682,6 +687,9 @@ namespace ofxCanon {
 				? kEdsEvfOutputDevice_PC | (enableCameraScreen ? kEdsEvfOutputDevice_TFT : 0) // live view enabled
 				: 0; // live view disabled
 			this->setProperty(kEdsPropID_Evf_OutputDevice, outputDevice);
+		}
+		else {
+			this->setProperty(kEdsPropID_Evf_OutputDevice, 0);
 		}
 	}
 

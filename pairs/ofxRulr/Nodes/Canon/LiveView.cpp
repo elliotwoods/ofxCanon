@@ -1,24 +1,27 @@
-#include "CanonLiveView.h"
+#include "LiveView.h"
 
 #include "ofxRulr/Nodes/Item/Camera.h"
-#include "../../../addons/ofxEdsdk/pairs/ofxMachineVision/Device/CanonDSLRDevice.h"
+#include "ofxCanon.h"
+#include "../../../ofxCanon/pairs/ofxMachineVision/Device/Canon.h"
 
 namespace ofxRulr {
 	namespace Nodes {
-		namespace Monitor {
+		namespace Canon {
 			//----------
-			CanonLiveView::CanonLiveView() {
+			LiveView::LiveView() {
 				RULR_NODE_INIT_LISTENER;
 			}
 
 			//----------
-			string CanonLiveView::getTypeName() const {
-				return "Monitor::CanonLiveView";
+			string LiveView::getTypeName() const {
+				return "Canon::LiveView";
 			}
 
 			//----------
-			void CanonLiveView::init() {
+			void LiveView::init() {
 				RULR_NODE_UPDATE_LISTENER;
+
+				this->manageParameters(this->parameters);
 
 				this->addInput<Item::Camera>();
 
@@ -27,35 +30,46 @@ namespace ofxRulr {
 				this->panel->onDraw += [this](ofxCvGui::DrawArguments & args) {
 					if (!this->panel->getDrawObject()) {
 						//we have no target to draw, let's give a notice to the user
-						ofxCvGui::Utils::drawText("Connect Item::Camera with device type CanonDSLRDevice", args.localBounds);
+						ofxCvGui::Utils::drawText("Connect Item::Camera with device type Canon and set enabled to true.", args.localBounds);
 					}
 				};
 			}
 			
 			//----------
-			void CanonLiveView::update() {
+			void LiveView::update() {
 				this->updateDrawObject();
 			}
 
 
 			//----------
-			ofxCvGui::PanelPtr CanonLiveView::getPanel() {
+			ofxCvGui::PanelPtr LiveView::getPanel() {
 				return this->panel;
 			}
 
 			//----------
-			void CanonLiveView::updateDrawObject() {
+			void LiveView::updateDrawObject() {
 				//try and set the view target to the canon device
 				auto camera = this->getInput<Item::Camera>();
 				if (camera) {
 					auto grabber = camera->getGrabber();
-					auto device = dynamic_pointer_cast<ofxMachineVision::Device::CanonDSLRDevice>(grabber->getDevice());
+					auto device = dynamic_pointer_cast<ofxMachineVision::Device::Canon>(grabber->getDevice());
 					if (device) {
-						auto canonDevice = device->getCamera();
-						this->panel->setDrawObject(canonDevice->getLiveTexture());
+						auto canonCamera = device->getCamera();
+						if (canonCamera) {
+							if (this->parameters.enabled) {
+								canonCamera->setLiveView(true);
+								if (canonCamera->isLiveDataReady()) {
+									this->panel->setDrawObject(canonCamera->getLiveTexture());
 
-						//we succeeded so lets exit
-						return;
+									//we succeeded so lets exit
+									return;
+								}
+							}
+							else {
+								canonCamera->setLiveView(false);
+							}
+							
+						}
 					}
 				}
 

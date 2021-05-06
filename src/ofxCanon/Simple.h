@@ -56,6 +56,8 @@ namespace ofxCanon {
 		void setDeviceId(int deviceId);
 		void setOrientationMode(int orientationMode);
 		void setLiveView(bool useLiveView);
+		bool getLiveViewEnabled();
+
 		bool setup();
 		void close();
 

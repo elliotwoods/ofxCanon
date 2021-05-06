@@ -5,10 +5,10 @@
 
 namespace ofxRulr {
 	namespace Nodes {
-		namespace Monitor {
-			class CanonLiveView : public Base {
+		namespace Canon {
+			class LiveView : public Base {
 			public:
-				CanonLiveView();
+				LiveView();
 				string getTypeName() const override;
 
 				void init();
@@ -18,6 +18,11 @@ namespace ofxRulr {
 			protected:
 				void updateDrawObject();
 				shared_ptr<ofxCvGui::Panels::Draws> panel;
+
+				struct : ofParameterGroup {
+					ofParameter<bool> enabled{ "Enabled", true };
+					PARAM_DECLARE("LiveView", enabled);
+				} parameters;
 			};
 		}
 	}
