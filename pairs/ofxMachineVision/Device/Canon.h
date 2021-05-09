@@ -7,10 +7,17 @@ namespace ofxMachineVision {
 	namespace Device {
 		class Canon : public Updating {
 		public:
+			struct InitialisationSettings : public Base::InitialisationSettings {
+				InitialisationSettings() {
+					this->add(this->monoDebayer);
+				}
+
+				ofParameter<bool> monoDebayer{ "Mono debayer", false };
+			};
 			Canon();
 			string getTypeName() const override;
 			shared_ptr<Base::InitialisationSettings> getDefaultSettings() const override {
-				return make_shared<Base::InitialisationSettings>();
+				return make_shared<InitialisationSettings>();
 			}
 			Specification open(shared_ptr<Base::InitialisationSettings> = nullptr) override;
 			void close() override;

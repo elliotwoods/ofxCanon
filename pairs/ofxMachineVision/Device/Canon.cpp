@@ -169,6 +169,16 @@ namespace ofxMachineVision {
 				return Specification();
 			}
 
+			{
+				auto typedInitialisationSettings = dynamic_pointer_cast<InitialisationSettings>(initialisationSettings);
+				if (typedInitialisationSettings) {
+					if(typedInitialisationSettings->monoDebayer) {
+						this->customParameters.monoDebayerEnabled->getParameterTyped<bool>()->set(true);
+						this->customParameters.directRawEnabled->getParameterTyped<bool>()->set(true);
+						this->customParameters.normalize->getParameterTyped<bool>()->set(true);
+					}
+				}
+			}
 			this->openTime = chrono::system_clock::now();
 			this->frameIndex = 0;
 
