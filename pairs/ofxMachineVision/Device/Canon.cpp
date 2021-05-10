@@ -4,6 +4,8 @@
 #include "ofxCvMin.h"
 #include "FreeImage.h"
 
+#include <future>
+
 template<typename PixelsType>
 void normalize(ofPixels_<PixelsType>& pixels, float percentile) {
 	if (percentile > 1.0f || percentile < 0.0f) {
@@ -344,32 +346,60 @@ namespace ofxMachineVision {
 					{
 						auto crossKernel = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
 						auto boxKernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3));
-						cv::dilate(redPlane, redPlane, boxKernel);
-						cv::dilate(greenPlane, greenPlane, crossKernel);
-						cv::dilate(bluePlane, bluePlane, boxKernel);
+						auto doRed = std::async(std::launch::async, [&]() {
+							cv::dilate(redPlane, redPlane, boxKernel);
+							});
+						auto doGreen = std::async(std::launch::async, [&]() {
+							cv::dilate(greenPlane, greenPlane, crossKernel);
+							});
+						auto doBlue = std::async(std::launch::async, [&]() {
+							cv::dilate(bluePlane, bluePlane, boxKernel);
+							});
+
+						doRed.wait();
+						doGreen.wait();
+						doBlue.wait();
 					}
 
 					//take local maxima for the color planes
 					{
 						auto dilateIterations = this->customParameters.monoDebayerDilateIterations->getParameterTyped<int>()->get();
 						auto kernelSize = cv::Size(3, 3);
-						auto kernel = cv::getStructuringElement(cv::MORPH_RECT, kernelSize);
 						for (int i = 0; i < dilateIterations; i++) {
-							//cv::dilate(redPlane, redPlane, kernel);
-							//cv::dilate(greenPlane, greenPlane, kernel);
-							//cv::dilate(bluePlane, bluePlane, kernel);
-							cv::blur(redPlane, redPlane, kernelSize);
-							cv::blur(greenPlane, greenPlane, kernelSize);
-							cv::blur(bluePlane, bluePlane, kernelSize);
+							auto doRed = std::async(std::launch::async, [&]() {
+								cv::blur(redPlane, redPlane, kernelSize);
+								});
+
+							auto doGreen = std::async(std::launch::async, [&]() {
+								cv::blur(greenPlane, greenPlane, kernelSize);
+								});
+
+							auto doBlue = std::async(std::launch::async, [&]() {
+								cv::blur(bluePlane, bluePlane, kernelSize);
+								});
+							
+							doRed.wait();
+							doGreen.wait();
+							doBlue.wait();
 						}
 					}
 
 					//promote resolution to float for each plane
 					cv::Mat redPlaneFloat, greenPlaneFloat, bluePlaneFloat;
 					{
-						redPlane.convertTo(redPlaneFloat, CV_32F);
-						greenPlane.convertTo(greenPlaneFloat, CV_32F);
-						bluePlane.convertTo(bluePlaneFloat, CV_32F);
+						auto doRed = std::async(std::launch::async, [&]() {
+							redPlane.convertTo(redPlaneFloat, CV_32F);
+							});
+						auto doGreen = std::async(std::launch::async, [&]() {
+							greenPlane.convertTo(greenPlaneFloat, CV_32F);
+							});
+						auto doBlue = std::async(std::launch::async, [&]() {
+							bluePlane.convertTo(bluePlaneFloat, CV_32F);
+							});
+
+						doRed.wait();
+						doGreen.wait();
+						doBlue.wait();
 					}
 
 					//create factors as planes
