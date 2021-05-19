@@ -7,9 +7,13 @@
 #include <future>
 
 template<typename PixelsType>
-void normalize(ofPixels_<PixelsType>& pixels, float percentile) {
+void normalize(ofPixels_<PixelsType>& pixels, float percentile, float ignoreTop, float normalizeTo) {
 	if (percentile > 1.0f || percentile < 0.0f) {
 		throw(ofxMachineVision::Exception("Percentile parameter is out of range"));
+	}
+
+	if (ignoreTop >= 1.0f || ignoreTop < 0.0f) {
+		throw(ofxMachineVision::Exception("Ignore top percentile parameter is out of range"));
 	}
 
 	if (percentile == 1.0f) {
@@ -17,7 +21,7 @@ void normalize(ofPixels_<PixelsType>& pixels, float percentile) {
 		auto image = ofxCv::toCv(pixels);
 		cv::normalize(image
 			, image
-			, std::numeric_limits<PixelsType>::max()
+			, (float) std::numeric_limits<PixelsType>::max() * normalizeTo
 			, 0.0
 			, cv::NormTypes::NORM_INF);
 	}
@@ -29,7 +33,7 @@ void normalize(ofPixels_<PixelsType>& pixels, float percentile) {
 		std::vector<PixelsType> values;
 
 		// skip to every 16th pixel to speed up
-		for (size_t i = 0; i < pixels.size(); i += 16) {
+		for (size_t i = ignoreTop * (float) pixels.size(); i < pixels.size(); i += 16) {
 			values.push_back(data[i]);
 		}
 
@@ -37,7 +41,7 @@ void normalize(ofPixels_<PixelsType>& pixels, float percentile) {
 
 		auto maxValue = values.at(((float)values.size() - 1) * percentile);
 
-		float normFactor = (float)std::numeric_limits<PixelsType>::max() / (float)maxValue;
+		float normFactor = (float)std::numeric_limits<PixelsType>::max() / (float)maxValue * normalizeTo;
 		for (size_t i = 0; i < pixels.size(); i++) {
 			data[i] = (PixelsType)((float)data[i] * normFactor);
 		}
@@ -78,7 +82,9 @@ namespace ofxMachineVision {
 			this->customParameters.monoDebayerEnabled = make_shared<ofxMachineVision::Parameter<bool>>(ofParameter<bool>("Mono debayer enabled", false));
 			this->customParameters.monoDebayerDilateIterations = make_shared<ofxMachineVision::Parameter<int>>(ofParameter<int>("Mono debayer dilations", 2));
 			this->customParameters.normalize = make_shared<ofxMachineVision::Parameter<bool>>(ofParameter<bool>("Normalize", false));
-			this->customParameters.normalizePercentile = make_shared<ofxMachineVision::Parameter<float>>(ofParameter<float>("Normalize %", 1, 0, 1));
+			this->customParameters.normalizePercentile = make_shared<ofxMachineVision::Parameter<float>>(ofParameter<float>("Normalize %", 0.99, 0, 1));
+			this->customParameters.normalizeIgnoreTop = make_shared<ofxMachineVision::Parameter<float>>(ofParameter<float>("Normalize ignore top %", 0.01, 0, 1));
+			this->customParameters.normalizeTo = make_shared<ofxMachineVision::Parameter<float>>(ofParameter<float>("Normalize to", 0.5, 0, 1));
 
 			// Add to this->parameters 
 			this->parameters.insert(this->parameters.end()
@@ -91,6 +97,8 @@ namespace ofxMachineVision {
 					, this->customParameters.monoDebayerDilateIterations
 					, this->customParameters.normalize
 					, this->customParameters.normalizePercentile
+					, this->customParameters.normalizeIgnoreTop
+					, this->customParameters.normalizeTo
 				});
 
 			// Attach actions to the parameters
@@ -260,7 +268,10 @@ namespace ofxMachineVision {
 
 				//normalize
 				if (this->customParameters.normalize->getParameterTyped<bool>()->get()) {
-					normalize(frame->getPixels(), this->customParameters.normalizePercentile->getParameterTyped<float>()->get());
+					normalize(frame->getPixels()
+						, this->customParameters.normalizePercentile->getParameterTyped<float>()->get()
+						, this->customParameters.normalizeIgnoreTop->getParameterTyped<float>()->get()
+						, this->customParameters.normalizeTo->getParameterTyped<float>()->get());
 				}
 			}
 
@@ -283,7 +294,10 @@ namespace ofxMachineVision {
 
 				//normalize before processing
 				if (this->customParameters.normalize->getParameterTyped<bool>()->get()) {
-					normalize(rawPixels, this->customParameters.normalizePercentile->getParameterTyped<float>()->get());
+					normalize(rawPixels
+						, this->customParameters.normalizePercentile->getParameterTyped<float>()->get()
+						, this->customParameters.normalizeIgnoreTop->getParameterTyped<float>()->get()
+						, this->customParameters.normalizeTo->getParameterTyped<float>()->get());
 				}
 
 				//perform the process of mono debayering based on neighborhood white balance

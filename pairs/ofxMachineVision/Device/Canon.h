@@ -43,6 +43,8 @@ namespace ofxMachineVision {
 				shared_ptr<ofxMachineVision::Parameter<int>> monoDebayerDilateIterations;
 				shared_ptr<ofxMachineVision::Parameter<bool>> normalize;
 				shared_ptr<ofxMachineVision::Parameter<float>> normalizePercentile;
+				shared_ptr<ofxMachineVision::Parameter<float>> normalizeIgnoreTop;
+				shared_ptr<ofxMachineVision::Parameter<float>> normalizeTo;
 			} customParameters;
 		};
 	}
