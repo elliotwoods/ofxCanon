@@ -6,49 +6,6 @@
 
 #include <future>
 
-template<typename PixelsType>
-void normalize(ofPixels_<PixelsType>& pixels, float percentile, float ignoreTop, float normalizeTo) {
-	if (percentile > 1.0f || percentile < 0.0f) {
-		throw(ofxMachineVision::Exception("Percentile parameter is out of range"));
-	}
-
-	if (ignoreTop >= 1.0f || ignoreTop < 0.0f) {
-		throw(ofxMachineVision::Exception("Ignore top percentile parameter is out of range"));
-	}
-
-	if (percentile == 1.0f) {
-		// use opencv in this situation
-		auto image = ofxCv::toCv(pixels);
-		cv::normalize(image
-			, image
-			, (float) std::numeric_limits<PixelsType>::max() * normalizeTo
-			, 0.0
-			, cv::NormTypes::NORM_INF);
-	}
-	else {
-		// do it ourselves otherwise
-
-		auto data = pixels.getData();
-
-		std::vector<PixelsType> values;
-
-		// skip to every 16th pixel to speed up
-		for (size_t i = ignoreTop * (float) pixels.size(); i < pixels.size(); i += 16) {
-			values.push_back(data[i]);
-		}
-
-		std::sort(values.begin(), values.end());
-
-		auto maxValue = values.at(((float)values.size() - 1) * percentile);
-
-		float normFactor = (float)std::numeric_limits<PixelsType>::max() / (float)maxValue * normalizeTo;
-		for (size_t i = 0; i < pixels.size(); i++) {
-			data[i] = (PixelsType)((float)data[i] * normFactor);
-		}
-	}
-	
-}
-
 enum class BayerColor {
 	Green = 0
 	, Red = 1
@@ -85,6 +42,8 @@ namespace ofxMachineVision {
 			this->customParameters.normalizePercentile = make_shared<ofxMachineVision::Parameter<float>>(ofParameter<float>("Normalize %", 0.99, 0, 1));
 			this->customParameters.normalizeIgnoreTop = make_shared<ofxMachineVision::Parameter<float>>(ofParameter<float>("Normalize ignore top %", 0.01, 0, 1));
 			this->customParameters.normalizeTo = make_shared<ofxMachineVision::Parameter<float>>(ofParameter<float>("Normalize to", 0.5, 0, 1));
+			this->customParameters.adaptiveNormalize = make_shared<ofxMachineVision::Parameter<bool>>(ofParameter<bool>("Adaptive normalize", false));
+			this->customParameters.adaptiveNormalizeWindowSize = make_shared<ofxMachineVision::Parameter<float>>(ofParameter<float>("Adaptive normalize window size", 0.2f));
 
 			// Add to this->parameters 
 			this->parameters.insert(this->parameters.end()
@@ -99,6 +58,8 @@ namespace ofxMachineVision {
 					, this->customParameters.normalizePercentile
 					, this->customParameters.normalizeIgnoreTop
 					, this->customParameters.normalizeTo
+					, this->customParameters.adaptiveNormalize
+					, this->customParameters.adaptiveNormalizeWindowSize
 				});
 
 			// Attach actions to the parameters
@@ -303,141 +264,15 @@ namespace ofxMachineVision {
 				//perform the process of mono debayering based on neighborhood white balance
 				if (this->customParameters.monoDebayerEnabled->getParameterTyped<bool>()->get()) {
 					cv::Mat image = ofxCv::toCv(rawPixels);
+					Canon::processRawMono(image, this->customParameters.monoDebayerDilateIterations->getParameterTyped<int>()->get());
+				}
 
-					auto width = rawPixels.getWidth();
-					auto height = rawPixels.getHeight();
-
-					//create masks for red, green, blue planes
-					cv::Mat redMask(height, width, CV_8U);
-					cv::Mat greenMask(height, width, CV_8U);
-					cv::Mat blueMask(height, width, CV_8U);
-					{
-						redMask.setTo(cv::Scalar(0));
-						greenMask.setTo(cv::Scalar(0));
-						blueMask.setTo(cv::Scalar(0));
-
-						auto redOut = redMask.data;
-						auto greenOut = greenMask.data;
-						auto blueOut = blueMask.data;
-
-						for (size_t y = 0; y < height; ++y) {
-							for (size_t x = 0; x < width; ++x) {
-								auto color = getBayerColor(x, y);
-								switch (color) {
-								case BayerColor::Red:
-									*redOut = 255;
-									break;
-								case BayerColor::Green:
-									*greenOut = 255;
-									break;
-								case BayerColor::Blue:
-									*blueOut = 255;
-									break;
-								}
-
-								redOut++;
-								greenOut++;
-								blueOut++;
-							}
-						}
-					}
-
-					//extract red, green, blue planes
-					cv::Mat redPlane(height, width, CV_16U);
-					cv::Mat greenPlane(height, width, CV_16U);
-					cv::Mat bluePlane(height, width, CV_16U);
-					{
-						redPlane.setTo(cv::Scalar(0));
-						greenPlane.setTo(cv::Scalar(0));
-						bluePlane.setTo(cv::Scalar(0));
-
-						cv::copyTo(image, redPlane, redMask);
-						cv::copyTo(image, greenPlane, greenMask);
-						cv::copyTo(image, bluePlane, blueMask);
-					}
-
-					//dilate the planes
-					{
-						auto crossKernel = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
-						auto boxKernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3));
-						auto doRed = std::async(std::launch::async, [&]() {
-							cv::dilate(redPlane, redPlane, boxKernel);
-							});
-						auto doGreen = std::async(std::launch::async, [&]() {
-							cv::dilate(greenPlane, greenPlane, crossKernel);
-							});
-						auto doBlue = std::async(std::launch::async, [&]() {
-							cv::dilate(bluePlane, bluePlane, boxKernel);
-							});
-
-						doRed.wait();
-						doGreen.wait();
-						doBlue.wait();
-					}
-
-					//take local maxima for the color planes
-					{
-						auto dilateIterations = this->customParameters.monoDebayerDilateIterations->getParameterTyped<int>()->get();
-						auto kernelSize = cv::Size(3, 3);
-						for (int i = 0; i < dilateIterations; i++) {
-							auto doRed = std::async(std::launch::async, [&]() {
-								cv::blur(redPlane, redPlane, kernelSize);
-								});
-
-							auto doGreen = std::async(std::launch::async, [&]() {
-								cv::blur(greenPlane, greenPlane, kernelSize);
-								});
-
-							auto doBlue = std::async(std::launch::async, [&]() {
-								cv::blur(bluePlane, bluePlane, kernelSize);
-								});
-							
-							doRed.wait();
-							doGreen.wait();
-							doBlue.wait();
-						}
-					}
-
-					//promote resolution to float for each plane
-					cv::Mat redPlaneFloat, greenPlaneFloat, bluePlaneFloat;
-					{
-						auto doRed = std::async(std::launch::async, [&]() {
-							redPlane.convertTo(redPlaneFloat, CV_32F);
-							});
-						auto doGreen = std::async(std::launch::async, [&]() {
-							greenPlane.convertTo(greenPlaneFloat, CV_32F);
-							});
-						auto doBlue = std::async(std::launch::async, [&]() {
-							bluePlane.convertTo(bluePlaneFloat, CV_32F);
-							});
-
-						doRed.wait();
-						doGreen.wait();
-						doBlue.wait();
-					}
-
-					//create factors as planes
-					cv::Mat redFactor, blueFactor;
-					{
-						redFactor = greenPlaneFloat / redPlaneFloat;
-						blueFactor = greenPlaneFloat / bluePlaneFloat;
-					}
-
-					//mask copy the factors back into a combined factor plane
-					cv::Mat factor(height, width, CV_32F);
-					{
-						factor.setTo(cv::Scalar(1.0f));
-						cv::copyTo(redFactor, factor, redMask);
-						cv::copyTo(blueFactor, factor, blueMask);
-					}
-
-					//apply the factor plane and copy back into the original image
-					{
-						cv::Mat resultFloat;
-						image.convertTo(resultFloat, CV_32F);
-						resultFloat = resultFloat.mul(factor);
-						resultFloat.convertTo(image, CV_16U);
-					}
+				// adaptive normalize
+				if (this->customParameters.adaptiveNormalize->getParameterTyped<bool>()->get()) {
+					auto windowSize = this->customParameters.adaptiveNormalizeWindowSize->getParameterTyped<float>()->get();
+					cv::Mat image = ofxCv::toCv(rawPixels);
+					auto normalisedImage = adaptiveNormalize(image, windowSize);
+					normalisedImage.copyTo(image);
 				}
 
 				// Note the raw pixels have been converted by this point:
@@ -457,6 +292,183 @@ namespace ofxMachineVision {
 		//----------
 		shared_ptr<ofxCanon::Simple> Canon::getCamera() {
 			return this->camera;
+		}
+
+		//----------
+		void Canon::processRawMono(const cv::Mat & image, int dilateIterations) {
+			auto width = image.cols;
+			auto height = image.rows;
+
+			//create masks for red, green, blue planes
+			cv::Mat redMask(height, width, CV_8U);
+			cv::Mat greenMask(height, width, CV_8U);
+			cv::Mat blueMask(height, width, CV_8U);
+			{
+				redMask.setTo(cv::Scalar(0));
+				greenMask.setTo(cv::Scalar(0));
+				blueMask.setTo(cv::Scalar(0));
+
+				auto redOut = redMask.data;
+				auto greenOut = greenMask.data;
+				auto blueOut = blueMask.data;
+
+				for (size_t y = 0; y < height; ++y) {
+					for (size_t x = 0; x < width; ++x) {
+						auto color = getBayerColor(x, y);
+						switch (color) {
+						case BayerColor::Red:
+							*redOut = 255;
+							break;
+						case BayerColor::Green:
+							*greenOut = 255;
+							break;
+						case BayerColor::Blue:
+							*blueOut = 255;
+							break;
+						}
+
+						redOut++;
+						greenOut++;
+						blueOut++;
+					}
+				}
+			}
+
+			//extract red, green, blue planes
+			cv::Mat redPlane(height, width, CV_16U);
+			cv::Mat greenPlane(height, width, CV_16U);
+			cv::Mat bluePlane(height, width, CV_16U);
+			{
+				redPlane.setTo(cv::Scalar(0));
+				greenPlane.setTo(cv::Scalar(0));
+				bluePlane.setTo(cv::Scalar(0));
+
+				cv::copyTo(image, redPlane, redMask);
+				cv::copyTo(image, greenPlane, greenMask);
+				cv::copyTo(image, bluePlane, blueMask);
+			}
+
+			//dilate the planes
+			{
+				auto crossKernel = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
+				auto boxKernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3));
+				auto doRed = std::async(std::launch::async, [&]() {
+					cv::dilate(redPlane, redPlane, boxKernel);
+					});
+				auto doGreen = std::async(std::launch::async, [&]() {
+					cv::dilate(greenPlane, greenPlane, crossKernel);
+					});
+				auto doBlue = std::async(std::launch::async, [&]() {
+					cv::dilate(bluePlane, bluePlane, boxKernel);
+					});
+
+				doRed.wait();
+				doGreen.wait();
+				doBlue.wait();
+			}
+
+			//take local maxima for the color planes
+			{
+				auto kernelSize = cv::Size(3, 3);
+				for (int i = 0; i < dilateIterations; i++) {
+					auto doRed = std::async(std::launch::async, [&]() {
+						cv::blur(redPlane, redPlane, kernelSize);
+						});
+
+					auto doGreen = std::async(std::launch::async, [&]() {
+						cv::blur(greenPlane, greenPlane, kernelSize);
+						});
+
+					auto doBlue = std::async(std::launch::async, [&]() {
+						cv::blur(bluePlane, bluePlane, kernelSize);
+						});
+
+					doRed.wait();
+					doGreen.wait();
+					doBlue.wait();
+				}
+			}
+
+			//promote resolution to float for each plane
+			cv::Mat redPlaneFloat, greenPlaneFloat, bluePlaneFloat;
+			{
+				auto doRed = std::async(std::launch::async, [&]() {
+					redPlane.convertTo(redPlaneFloat, CV_32F);
+					});
+				auto doGreen = std::async(std::launch::async, [&]() {
+					greenPlane.convertTo(greenPlaneFloat, CV_32F);
+					});
+				auto doBlue = std::async(std::launch::async, [&]() {
+					bluePlane.convertTo(bluePlaneFloat, CV_32F);
+					});
+
+				doRed.wait();
+				doGreen.wait();
+				doBlue.wait();
+			}
+
+			//create factors as planes
+			cv::Mat redFactor, blueFactor;
+			{
+				redFactor = greenPlaneFloat / redPlaneFloat;
+				blueFactor = greenPlaneFloat / bluePlaneFloat;
+			}
+
+			//mask copy the factors back into a combined factor plane
+			cv::Mat factor(height, width, CV_32F);
+			{
+				factor.setTo(cv::Scalar(1.0f));
+				cv::copyTo(redFactor, factor, redMask);
+				cv::copyTo(blueFactor, factor, blueMask);
+			}
+
+			//apply the factor plane and copy back into the original image
+			{
+				cv::Mat resultFloat;
+				image.convertTo(resultFloat, CV_32F);
+				resultFloat = resultFloat.mul(factor);
+				resultFloat.convertTo(image, CV_16U);
+			}
+		}
+
+		//---------
+		cv::Mat Canon::adaptiveNormalize(cv::Mat input, float windowSize) {
+			if (input.empty()) {
+				throw(ofxMachineVision::Exception("Empty image passed into adaptiveNormalize"));
+			}
+
+			//get minimum and maximum images
+			auto kernelSize = 5;
+			auto boxKernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(kernelSize, kernelSize));
+			int iterations = (float)input.cols * windowSize / kernelSize;
+			auto maximum = input.clone();
+			auto minimum = input.clone();
+			auto doMaximum = std::thread([&]() {
+				cv::dilate(maximum
+					, maximum
+					, boxKernel
+					, cv::Point(-1, -1)
+					, iterations);
+				});
+			auto doMinimum = std::thread([&]() {
+				cv::erode(minimum
+					, minimum
+					, boxKernel
+					, cv::Point(-1, -1)
+					, iterations);
+				});
+			doMinimum.join();
+			doMaximum.join();
+
+			cv::Mat range = maximum - minimum;
+			cv::Mat floatRange;
+			cv::Mat floatInput;
+			range.convertTo(floatRange, CV_32F);
+			input.convertTo(floatInput, CV_32F);
+			cv::Mat floatOutput = floatInput * 255.0f / floatRange;
+			cv::Mat output;
+			floatOutput.convertTo(output, CV_8U);
+			return output;
 		}
 	}
 }

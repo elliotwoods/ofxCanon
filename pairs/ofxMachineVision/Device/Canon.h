@@ -2,9 +2,12 @@
 
 #include "ofxCanon.h"
 #include "ofxMachineVision.h"
+#include <opencv2/opencv.hpp>
 
 namespace ofxMachineVision {
 	namespace Device {
+		cv::Mat adaptiveNormalize(cv::Mat input, float windowSize);
+
 		class Canon : public Updating {
 		public:
 			struct InitialisationSettings : public Base::InitialisationSettings {
@@ -28,6 +31,20 @@ namespace ofxMachineVision {
 			shared_ptr<Frame> getFrame() override;
 
 			shared_ptr<ofxCanon::Simple> getCamera();
+
+			//--
+			// Mono debayer functions
+			//
+			static void processRawMono(const cv::Mat & image
+				, int dilateIterations);
+
+			static cv::Mat adaptiveNormalize(cv::Mat input, float windowSize);
+
+			template<typename PixelsType>
+			static void normalize(ofPixels_<PixelsType>& pixels, float percentile, float ignoreTop, float normalizeTo);
+			//
+			//--
+
 		protected:
 			int frameIndex;
 			bool markFrameNew;
@@ -45,7 +62,11 @@ namespace ofxMachineVision {
 				shared_ptr<ofxMachineVision::Parameter<float>> normalizePercentile;
 				shared_ptr<ofxMachineVision::Parameter<float>> normalizeIgnoreTop;
 				shared_ptr<ofxMachineVision::Parameter<float>> normalizeTo;
+				shared_ptr<ofxMachineVision::Parameter<bool>> adaptiveNormalize;
+				shared_ptr<ofxMachineVision::Parameter<float>> adaptiveNormalizeWindowSize;
 			} customParameters;
 		};
 	}
 }
+
+#include "debayerRoutines.h"
