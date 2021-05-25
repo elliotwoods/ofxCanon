@@ -42,9 +42,14 @@ public:
 			PARAM_DECLARE("Mono debayer", enabled, dilationIterations);
 		} monoDebayer;
 		
-		ofParameter<bool> saveOnProcess{ "Save on process", true };
-		ofParameter<string> outputFileType{ "Output file type", "tiff" };
+		struct : ofParameterGroup {
+			ofParameter<bool> onProcess{ "On process", true };
+			ofParameter<string> fileType{ "File type", "tiff" };
+			ofParameter<bool> as16Bit{ "16 bit", true };
+			PARAM_DECLARE("Save", onProcess, fileType, as16Bit);
+		} save;
 		
-		PARAM_DECLARE("Parameters", normalize, monoDebayer, saveOnProcess, outputFileType);
+		
+		PARAM_DECLARE("Parameters", normalize, monoDebayer, save);
 	} parameters;
 };

@@ -132,7 +132,7 @@ void ofApp::takePhoto() {
 
 	this->process();
 
-	if (this->parameters.saveOnProcess) {
+	if (this->parameters.save.onProcess) {
 		// new photo image name
 		char filenameMain[80];
 		{
@@ -145,7 +145,7 @@ void ofApp::takePhoto() {
 			strftime(filenameMain, 80, "%Y%m%d_%H%M", timeinfo);
 		}
 
-		auto filename = string(filenameMain) + "." + this->parameters.outputFileType.get();
+		auto filename = string(filenameMain) + "." + this->parameters.save.fileType.get();
 		ofSaveImage(this->result, filename);
 		cout << "Saved to : " << filename << std::endl;
 	}
@@ -210,7 +210,14 @@ void ofApp::processFile(const string& filename) {
 
 	this->process();
 
-	auto outputFilename = ofFilePath::removeExt(filename) + "." + this->parameters.outputFileType.get();
-	ofSaveImage(this->result.getPixels(), outputFilename);
+	auto outputFilename = ofFilePath::removeExt(filename) + "." + this->parameters.save.fileType.get();
+	if(this->parameters.save.as16Bit.get()) {
+		ofSaveImage(this->result.getPixels(), outputFilename);
+	}
+	else {
+		ofPixels lowBitRateImage = this->result.getPixels();
+		ofSaveImage(lowBitRateImage, outputFilename);
+	}
+
 	cout << "Saved to : " << outputFilename << std::endl;
 }
