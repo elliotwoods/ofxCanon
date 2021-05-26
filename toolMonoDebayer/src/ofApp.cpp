@@ -211,13 +211,15 @@ void ofApp::processFile(const string& filename) {
 	this->process();
 
 	auto outputFilename = ofFilePath::removeExt(filename) + "." + this->parameters.save.fileType.get();
-	if(this->parameters.save.as16Bit.get()) {
-		ofSaveImage(this->result.getPixels(), outputFilename);
+	if (this->parameters.save.onProcess.get()) {
+		if (this->parameters.save.as16Bit.get()) {
+			ofSaveImage(this->result.getPixels(), outputFilename);
+		}
+		else {
+			ofPixels lowBitRateImage = this->result.getPixels();
+			ofSaveImage(lowBitRateImage, outputFilename);
+		}
 	}
-	else {
-		ofPixels lowBitRateImage = this->result.getPixels();
-		ofSaveImage(lowBitRateImage, outputFilename);
-	}
-
+	
 	cout << "Saved to : " << outputFilename << std::endl;
 }
