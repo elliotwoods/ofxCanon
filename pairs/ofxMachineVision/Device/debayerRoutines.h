@@ -40,7 +40,7 @@ namespace ofxMachineVision {
 
 				float normFactor = (float)std::numeric_limits<PixelsType>::max() / (float)maxValue * normalizeTo;
 				for (size_t i = 0; i < pixels.size(); i++) {
-					data[i] = (PixelsType)((float)data[i] * normFactor);
+					data[i] = (PixelsType)(min((float)data[i] * normFactor, (float) std::numeric_limits<PixelsType>::max()));
 				}
 			}
 		}
