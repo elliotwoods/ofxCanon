@@ -13,7 +13,8 @@ enum class BayerColor {
 };
 
 BayerColor getBayerColor(int x, int y) {
-	if (x % 2 == y % 2) {
+	if ((x % 2 == 1 && y % 2 == 0)
+		|| (x % 2 == 0 && y % 2 == 1)) {
 		return BayerColor::Green;
 	}
 	else if (x % 2 == 1) {

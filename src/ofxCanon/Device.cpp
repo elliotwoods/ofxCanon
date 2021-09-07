@@ -712,7 +712,7 @@ namespace ofxCanon {
 
 		for (EdsUInt32 i = 0; i < cameraCount; i++) {
 			EdsCameraRef camera;
-			ERROR_GOTO_FAIL(EdsGetChildAtIndex(cameraList, 0, &camera)
+			ERROR_GOTO_FAIL(EdsGetChildAtIndex(cameraList, i, &camera)
 				, "Get the camera device");
 
 			if (camera != NULL) {

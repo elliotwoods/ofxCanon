@@ -63,7 +63,4 @@
       <Filter>src\ofxCanon</Filter>
     </ClCompile>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="..\README.md" />
-  </ItemGroup>
 </Project>
