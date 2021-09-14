@@ -70,7 +70,9 @@ namespace ofxCanon {
 			return;
 		}
 
-		this->poll();
+		if (this->waitingForPhoto) {
+			this->poll();
+		}
 
 		this->frameIsNew = false;
 
@@ -84,6 +86,7 @@ namespace ofxCanon {
 
 			if (this->frameIsNew) {
 				this->image.load(buffer);
+				this->waitingForPhoto = false;
 			}
 		}
 	}
@@ -121,6 +124,8 @@ namespace ofxCanon {
 		if (response.status != 200) {
 			LOG_ERROR << "Couldn't take photo : " << response.data;
 		}
+
+		this->waitingForPhoto = true;
 	}
 
 	//----------

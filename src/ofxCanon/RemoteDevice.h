@@ -45,5 +45,7 @@ namespace ofxCanon {
 		ofThreadChannel<ofBuffer> incomingImages;
 		bool frameIsNew = false;
 		ofImage image;
+
+		bool waitingForPhoto = false;
 	};
 }

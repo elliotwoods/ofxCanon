@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\ofApp.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ofApp.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\pairs\ofxMachineVision\Device\CanonLiveView.cpp">
+      <Filter>pairs\ofxCanon\ofxMachineVision\Device</Filter>
+    </ClCompile>
+    <ClCompile Include="..\pairs\ofxMachineVision\Device\Canon.cpp">
+      <Filter>pairs\ofxCanon\ofxMachineVision\Device</Filter>
+    </ClCompile>
+    <ClCompile Include="..\pairs\ofxMachineVision\Device\CanonRemote.cpp">
+      <Filter>pairs\ofxCanon\ofxMachineVision\Device</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{d8376475-7454-4a24-b08a-aac121d3ad6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pairs">
+      <UniqueIdentifier>{eeded3a2-0547-4a50-909a-837f07e49d4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pairs\ofxCanon">
+      <UniqueIdentifier>{4251ef62-750a-4aaf-bd7f-df2cebd93ee5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pairs\ofxCanon\ofxMachineVision">
+      <UniqueIdentifier>{b9ae28b7-193e-484c-8163-47438815fe2c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pairs\ofxCanon\ofxMachineVision\Device">
+      <UniqueIdentifier>{eabfd267-9f44-4de4-8e26-eb69cb413d57}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\ofApp.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ofApp.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\pairs\ofxMachineVision\Device\CanonLiveView.h">
+      <Filter>pairs\ofxCanon\ofxMachineVision\Device</Filter>
+    </ClInclude>
+    <ClInclude Include="..\pairs\ofxMachineVision\Device\debayerRoutines.h">
+      <Filter>pairs\ofxCanon\ofxMachineVision\Device</Filter>
+    </ClInclude>
+    <ClInclude Include="..\pairs\ofxMachineVision\Device\Canon.h">
+      <Filter>pairs\ofxCanon\ofxMachineVision\Device</Filter>
+    </ClInclude>
+    <ClInclude Include="..\pairs\ofxMachineVision\Device\CanonRemote.h">
+      <Filter>pairs\ofxCanon\ofxMachineVision\Device</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="icon.rc" />
+  </ItemGroup>
+</Project>
