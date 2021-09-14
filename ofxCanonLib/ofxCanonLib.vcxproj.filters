@@ -45,6 +45,9 @@
     <ClInclude Include="..\src\ofxCanon\Simple.h">
       <Filter>src\ofxCanon</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\ofxCanon\RemoteDevice.h">
+      <Filter>src\ofxCanon</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\ofxCanon\Device.cpp">
@@ -60,6 +63,9 @@
       <Filter>src\ofxCanon</Filter>
     </ClCompile>
     <ClCompile Include="..\src\ofxCanon\Simple.cpp">
+      <Filter>src\ofxCanon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxCanon\RemoteDevice.cpp">
       <Filter>src\ofxCanon</Filter>
     </ClCompile>
   </ItemGroup>
