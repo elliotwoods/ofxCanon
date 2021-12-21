@@ -13,6 +13,7 @@ class ofApp : public ofBaseApp{
 
 		ofxCvGui::Builder gui;
 
-		ofParameter<string> hostname{ "Hostname", "10.0.0.180" };
+		shared_ptr<ofxMachineVision::Device::Base::InitialisationSettings> initialisationSettings;
+
 		ofxMachineVision::GrabberPtr grabber;
 };

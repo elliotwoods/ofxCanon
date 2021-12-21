@@ -7,12 +7,109 @@ namespace ofxMachineVision {
 		{
 			this->clear();
 			this->add(this->hostname);
+			this->add(this->deleteRemote);
 		}
 
 		//----------
 		CanonRemote::CanonRemote()
 		{
+			// Make the parameters
+			this->customParameters.shootingMode= make_shared<ofxMachineVision::Parameter<string>>(ofParameter<string>("Shooting mode", "m"));
+			this->customParameters.iso = make_shared<ofxMachineVision::Parameter<int>>(ofParameter<int>("ISO", 400));
+			this->customParameters.aperture = make_shared<ofxMachineVision::Parameter<float>>(ofParameter<float>("Aperture", 9, 0, 22));
+			this->customParameters.shutterSpeed = make_shared<ofxMachineVision::Parameter<float>>(ofParameter<float>("Shutter Speed", 1. / 30., 0, 60));
 
+			// Add to this->parameters 
+			this->parameters.insert(this->parameters.end()
+				, {
+					this->customParameters.shootingMode
+					, this->customParameters.iso
+					, this->customParameters.aperture
+					, this->customParameters.shutterSpeed
+				});
+
+			// Attach actions to the parameters
+			{
+				//shooting mode
+				{
+					this->customParameters.shootingMode->getDeviceValueFunction = [this]() {
+						string value;
+						if (this->device.getShootingMode(value)) {
+							return value;
+						}
+						else {
+							throw(ofxMachineVision::Exception("Failed to pull shootingMode"));
+						}
+					};
+					this->customParameters.shootingMode->setDeviceValueFunction = [this](const string& value) {
+						if (!this->device.setShootingMode(value)) {
+							throw(ofxMachineVision::Exception("Failed to push shootingMode"));
+						}
+					};
+				}
+
+				//iso 
+				{
+					this->customParameters.iso->getDeviceValueFunction = [this]() {
+						int value;
+						if (this->device.getISO(value)) {
+							return value;
+						}
+						else {
+							throw(ofxMachineVision::Exception("Failed to pull ISO"));
+						}
+					};
+					this->customParameters.iso->setDeviceValueFunction = [this](const int& value) {
+						if (!this->device.setISO(value)) {
+							throw(ofxMachineVision::Exception("Failed to push ISO"));
+						}
+					};
+				}
+
+				//aperture
+				{
+					this->customParameters.aperture->getDeviceValueFunction = [this]() {
+						float value;
+						if (this->device.getAperture(value)) {
+							return value;
+						}
+						else {
+							throw(ofxMachineVision::Exception("Failed to pull aperture"));
+						}
+					};
+					this->customParameters.aperture->setDeviceValueFunction = [this](const float& value) {
+						if (!this->device.setAperture(value)) {
+							throw(ofxMachineVision::Exception("Failed to push aperture"));
+						}
+					};
+				}
+
+				//shutterSpeed
+				{
+					this->customParameters.shutterSpeed->getDeviceValueFunction = [this]() {
+						float value;
+						if (this->device.getShutterSpeed(value)) {
+							return value;
+						}
+						else {
+							throw(ofxMachineVision::Exception("Failed to pull shutter speed"));
+						}
+					};
+					this->customParameters.shutterSpeed->setDeviceValueFunction = [this](const float& value) {
+						if (!this->device.setShutterSpeed(value)) {
+							throw(ofxMachineVision::Exception("Failed to push shutter speed"));
+						}
+					};
+				}
+			}
+
+			// Add listeners to events coming from device
+			{
+				ofAddListener(this->device.deviceEvents.onShootingModeChange, this, &CanonRemote::callbackDeviceShootingModeChange);
+				ofAddListener(this->device.deviceEvents.onISOChange, this, &CanonRemote::callbackDeviceISOChange);
+				ofAddListener(this->device.deviceEvents.onApertureChange, this, &CanonRemote::callbackDeviceApertureChange);
+				ofAddListener(this->device.deviceEvents.onShutterSpeedChange, this, &CanonRemote::callbackDeviceShutterSpeedChange);
+			}
 		}
 
 		//----------
@@ -113,6 +210,34 @@ namespace ofxMachineVision {
 			CanonRemote::getFrame()
 		{
 			return this->frame;
+		}
+
+		//----------
+		void
+			CanonRemote::callbackDeviceShootingModeChange(string& value)
+		{
+			this->customParameters.shootingMode->getParameterTypedAuto()->set(value);
+		}
+
+		//----------
+		void
+			CanonRemote::callbackDeviceISOChange(int& value)
+		{
+			this->customParameters.iso->getParameterTypedAuto()->set(value);
+		}
+
+		//----------
+		void
+			CanonRemote::callbackDeviceApertureChange(float& value)
+		{
+			this->customParameters.aperture->getParameterTypedAuto()->set(value);
+		}
+
+		//----------
+		void
+			CanonRemote::callbackDeviceShutterSpeedChange(float& value)
+		{
+			this->customParameters.shutterSpeed->getParameterTypedAuto()->set(value);
 		}
 	}
 }

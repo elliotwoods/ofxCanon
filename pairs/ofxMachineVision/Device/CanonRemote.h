@@ -8,7 +8,8 @@ namespace ofxMachineVision {
 		public:
 			struct InitialisationSettings : public Base::InitialisationSettings {
 				InitialisationSettings();
-				ofParameter<string> hostname;
+				ofParameter<string> hostname{ "Hostname", "172.30.1.100" };
+				ofParameter<bool> deleteRemote{ "Delete remote", false };
 			};
 
 			CanonRemote();
@@ -22,6 +23,11 @@ namespace ofxMachineVision {
 			bool isFrameNew() override;
 			shared_ptr<Frame> getFrame() override;
 		protected:
+			void callbackDeviceShootingModeChange(string&);
+			void callbackDeviceISOChange(int&);
+			void callbackDeviceApertureChange(float&);
+			void callbackDeviceShutterSpeedChange(float&);
+
 			ofxCanon::RemoteDevice device;
 			shared_ptr<Frame> frame;
 			uint64_t frameIndex = 0;
@@ -29,6 +35,13 @@ namespace ofxMachineVision {
 
 			bool firstFrame = true;
 			bool frameIsNew = false;
+
+			struct {
+				shared_ptr<ofxMachineVision::Parameter<string>> shootingMode;
+				shared_ptr<ofxMachineVision::Parameter<int>> iso;
+				shared_ptr<ofxMachineVision::Parameter<float>> aperture;
+				shared_ptr<ofxMachineVision::Parameter<float>> shutterSpeed;
+			} customParameters;
 		};
 	}
 }

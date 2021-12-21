@@ -27,15 +27,46 @@ namespace ofxCanon {
 		void update();
 		bool isFrameNew() const;
 
-		void takePhoto(bool autoFocus);
+		bool takePhoto(bool autoFocus);
 		
 		ofImage& getImage();
 
 		string getBaseURL() const;
 
+		bool getShootingMode(string &) const;
+		bool setShootingMode(const string&);
+
+		bool getISO(int&) const;
+		bool setISO(int);
+
+		bool getAperture(float &) const;
+		bool setAperture(float);
+
+		bool getShutterSpeed(float &) const;
+		bool setShutterSpeed(float);
+
+		int convertISOFromDevice(string) const;
+		string convertISOToDevice(int) const;
+
+		float convertApertureFromDevice(string) const;
+		string convertApertureToDevice(float) const;
+
+		float convertShutterSpeedFromDevice(string) const;
+		string convertShutterSpeedToDevice(float) const;
+
+		struct {
+			ofEvent<string> onShootingModeChange;
+			ofEvent<float> onShutterSpeedChange;
+			ofEvent<float> onApertureChange;
+			ofEvent<int> onISOChange;
+		} deviceEvents;
 	protected:
 		void poll();
 		void getFileFromCamera(const string & address);
+
+		nlohmann::json get(const string& address) const;
+		nlohmann::json put(const string& address, const nlohmann::json&);
+		vector<string> getOptions(const string& address) const;
 
 		string hostname;
 
