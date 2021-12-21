@@ -63,5 +63,7 @@ ofHttpResponse sendPutRequest(const std::string & url, const nlohmann::json & re
 		curl_slist_free_all(headers);
 	}
 
+	curl_easy_cleanup(hnd);
+
 	return response;
 }

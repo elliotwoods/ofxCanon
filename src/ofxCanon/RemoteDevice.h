@@ -20,8 +20,11 @@ namespace ofxCanon {
 		};
 
 		RemoteDevice();
-		bool setup(const string & hostname);
-		
+		~RemoteDevice();
+
+		bool open(const string & hostname);
+		void close();
+
 		DeviceInfo getDeviceInfo() const;
 
 		void update();
@@ -78,5 +81,20 @@ namespace ofxCanon {
 		ofImage image;
 
 		bool waitingForPhoto = false;
+
+		struct Thread {
+			std::thread thread;
+			ofThreadChannel<function<void()>> actionQueue;
+			ofThreadChannel<function<void()>> mainThreadActionQueue;
+			enum class State {
+				Closed,
+				Running,
+				Joining
+			} state = State::Closed;
+		} thread;
+
+		struct Exception {
+			std::string message;
+		};
 	};
 }

@@ -11,8 +11,14 @@ namespace ofxCanon {
 	}
 
 	//----------
+	RemoteDevice::~RemoteDevice()
+	{
+		this->close();
+	}
+
+	//----------
 	bool
-		RemoteDevice::setup(const string & hostname)
+		RemoteDevice::open(const string & hostname)
 	{
 		this->hostname = hostname;
 
@@ -53,7 +59,37 @@ namespace ofxCanon {
 			this->deviceInfo.firmwareVersion = json["firmwareversion"].get<string>();
 		}
 
+		this->thread.state = Thread::State::Running;
+		this->thread.thread = std::thread([this]() {
+			while (this->thread.state == Thread::State::Running) {
+				// perform action queue
+				std::function<void()> action;
+				while (this->thread.actionQueue.tryReceive(action)) {
+					try {
+						action();
+					}
+					catch (const Exception& e) {
+						LOG_ERROR << e.message;
+					}
+				}
+
+				// poll
+				this->poll();
+			}
+			});
+
 		return true;
+	}
+
+	//----------
+	void
+		RemoteDevice::close()
+	{
+		if (this->thread.state != Thread::State::Closed) {
+			this->thread.state = Thread::State::Joining;
+			this->thread.thread.join();
+			this->thread.state = Thread::State::Closed;
+		}
 	}
 
 	//----------
@@ -71,8 +107,6 @@ namespace ofxCanon {
 			return;
 		}
 
-		this->poll();
-
 		this->frameIsNew = false;
 
 		// Receive incoming images
@@ -86,6 +120,14 @@ namespace ofxCanon {
 			if (this->frameIsNew) {
 				this->image.load(buffer);
 				this->waitingForPhoto = false;
+			}
+		}
+
+		// Receive incoming actions
+		{
+			std::function<void()> action;
+			while (this->thread.mainThreadActionQueue.tryReceive(action)) {
+				action();
 			}
 		}
 	}
@@ -108,22 +150,25 @@ namespace ofxCanon {
 	bool 
 		RemoteDevice::takePhoto(bool autoFocus)
 	{
-		ofHttpRequest request;
-		{
-			request.method = ofHttpRequest::POST;
-			request.url = this->getBaseURL() + "shooting/control/shutterbutton";
+		this->thread.actionQueue.send([this, autoFocus]() {
+			ofHttpRequest request;
+			{
+				request.method = ofHttpRequest::POST;
+				request.url = this->getBaseURL() + "shooting/control/shutterbutton";
 
-			nlohmann::json requestData;
-			requestData["af"] = autoFocus;
-			request.body = requestData.dump();
-		}
+				nlohmann::json requestData;
+				requestData["af"] = autoFocus;
+				request.body = requestData.dump();
+			}
 
-		auto response = this->urlLoader.handleRequest(request);
+			auto response = this->urlLoader.handleRequest(request);
 
-		if (response.status != 200) {
-			LOG_ERROR << "Couldn't take photo : " << response.data;
-			return false;
-		}
+			if (response.status != 200) {
+				LOG_ERROR << "Couldn't take photo : " << response.data;
+				return false;
+			}
+			});
+
 
 		this->waitingForPhoto = true;
 		return true;
@@ -157,7 +202,6 @@ namespace ofxCanon {
 		nlohmann::json json;
 		json["value"] = value;
 		auto result = this->put("shooting/settings/shootingmode", json);
-		cout << result << std::endl;
 		return result.contains("value");
 	}
 
@@ -182,7 +226,6 @@ namespace ofxCanon {
 		nlohmann::json json;
 		json["value"] = this->convertISOToDevice(value);
 		auto result = this->put("shooting/settings/iso", json);
-		cout << result << std::endl;
 		return result.contains("value");
 	}
 
@@ -207,7 +250,6 @@ namespace ofxCanon {
 		nlohmann::json json;
 		json["value"] = RemoteDevice::convertApertureToDevice(value);
 		auto result = this->put("shooting/settings/av", json);
-		cout << result << std::endl;
 		return result.contains("value");
 	}
 
@@ -232,7 +274,6 @@ namespace ofxCanon {
 		nlohmann::json json;
 		json["value"] = RemoteDevice::convertShutterSpeedToDevice(value);
 		auto result = this->put("shooting/settings/tv", json);
-		cout << result << std::endl;
 		return result.contains("value");
 	}
 
@@ -403,8 +444,11 @@ namespace ofxCanon {
 
 		if (json.contains("shootingmode")) {
 			if (json["shootingmode"].contains("value")) {
-				auto stringValue = json["shootingmode"]["value"].get<string>();
-				ofNotifyEvent(this->deviceEvents.onShootingModeChange, stringValue, this);
+				auto value = json["shootingmode"]["value"].get<string>();
+				this->thread.mainThreadActionQueue.send([this, value]() {
+					auto valueCopy = value;
+					ofNotifyEvent(this->deviceEvents.onShootingModeChange, valueCopy, this);
+					});
 			}
 		}
 
@@ -412,7 +456,10 @@ namespace ofxCanon {
 			if (json["tv"].contains("value")) {
 				auto stringValue = json["tv"]["value"].get<string>();
 				auto value = this->convertShutterSpeedFromDevice(stringValue);
-				ofNotifyEvent(this->deviceEvents.onShutterSpeedChange, value, this);
+				this->thread.mainThreadActionQueue.send([this, value]() {
+					auto valueCopy = value;
+					ofNotifyEvent(this->deviceEvents.onShutterSpeedChange, valueCopy, this);
+					});
 			}
 		}
 
@@ -420,7 +467,10 @@ namespace ofxCanon {
 			if (json["av"].contains("value")) {
 				auto stringValue = json["av"]["value"].get<string>();
 				auto value = this->convertApertureFromDevice(stringValue);
-				ofNotifyEvent(this->deviceEvents.onApertureChange, value, this);
+				this->thread.mainThreadActionQueue.send([this, value]() {
+					auto valueCopy = value;
+					ofNotifyEvent(this->deviceEvents.onApertureChange, valueCopy, this);
+					});
 			}
 		}
 
@@ -434,7 +484,10 @@ namespace ofxCanon {
 				else {
 					value = ofToInt(stringValue);
 				}
-				ofNotifyEvent(this->deviceEvents.onISOChange, value, this);
+				this->thread.mainThreadActionQueue.send([this, value]() {
+					auto valueCopy = value;
+					ofNotifyEvent(this->deviceEvents.onISOChange, valueCopy, this);
+					});
 			}
 		}
 

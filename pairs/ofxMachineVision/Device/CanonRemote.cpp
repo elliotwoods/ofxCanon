@@ -136,7 +136,7 @@ namespace ofxMachineVision {
 				throw(ofxMachineVision::Exception("Invalid InitialisationSettings"));
 			}
 
-			this->device.setup(typedInitialisationSettings->hostname);
+			this->device.open(typedInitialisationSettings->hostname);
 			this->device.getImage().setUseTexture(false);
 			this->timeOpen = ofGetSystemTimeMicros();
 

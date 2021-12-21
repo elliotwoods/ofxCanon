@@ -39,6 +39,8 @@ void ofApp::setup() {
 	{
 		auto widgets = this->gui.addWidgets();
 
+		widgets->addFps();
+		widgets->addMemoryUsage();
 		widgets->addTitle("Open a device");
 
 		widgets->addTitle("Initialisation settings", ofxCvGui::Widgets::Title::Level::H2);
