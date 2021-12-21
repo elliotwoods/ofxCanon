@@ -62,7 +62,7 @@ void ofApp::setup() {
 
 				widgets->addButton("Take photo", [grabber]() {
 					grabber->singleShot();
-					});
+					}, ' ');
 
 				//Add device parameters
 				{

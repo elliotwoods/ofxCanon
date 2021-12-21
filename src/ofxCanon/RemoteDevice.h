@@ -31,10 +31,14 @@ namespace ofxCanon {
 		bool isFrameNew() const;
 
 		bool takePhoto(bool autoFocus);
+
 		
 		ofImage& getImage();
 
 		string getBaseURL() const;
+
+		void setKeepFilesOnDevice(bool);
+		bool getKeepFilesOnDevice() const;
 
 		bool getShootingMode(string &) const;
 		bool setShootingMode(const string&);
@@ -66,6 +70,7 @@ namespace ofxCanon {
 	protected:
 		void poll();
 		void getFileFromCamera(const string & address);
+		void deleteFileOnCamera(const string& address);
 
 		nlohmann::json get(const string& address) const;
 		nlohmann::json put(const string& address, const nlohmann::json&);
@@ -79,6 +84,8 @@ namespace ofxCanon {
 		ofThreadChannel<ofBuffer> incomingImages;
 		bool frameIsNew = false;
 		ofImage image;
+
+		bool keepFilesOnDevice = true;
 
 		bool waitingForPhoto = false;
 

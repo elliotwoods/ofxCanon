@@ -7,7 +7,6 @@ namespace ofxMachineVision {
 		{
 			this->clear();
 			this->add(this->hostname);
-			this->add(this->deleteRemote);
 		}
 
 		//----------
@@ -18,6 +17,7 @@ namespace ofxMachineVision {
 			this->customParameters.iso = make_shared<ofxMachineVision::Parameter<int>>(ofParameter<int>("ISO", 400));
 			this->customParameters.aperture = make_shared<ofxMachineVision::Parameter<float>>(ofParameter<float>("Aperture", 9, 0, 22));
 			this->customParameters.shutterSpeed = make_shared<ofxMachineVision::Parameter<float>>(ofParameter<float>("Shutter Speed", 1. / 30., 0, 60));
+			this->customParameters.keepPhotosOnCamera = make_shared<ofxMachineVision::Parameter<bool>>(ofParameter<bool>("Keep photos on camera", true));
 
 			// Add to this->parameters 
 			this->parameters.insert(this->parameters.end()
@@ -26,6 +26,7 @@ namespace ofxMachineVision {
 					, this->customParameters.iso
 					, this->customParameters.aperture
 					, this->customParameters.shutterSpeed
+					, this->customParameters.keepPhotosOnCamera
 				});
 
 			// Attach actions to the parameters
@@ -99,6 +100,16 @@ namespace ofxMachineVision {
 						if (!this->device.setShutterSpeed(value)) {
 							throw(ofxMachineVision::Exception("Failed to push shutter speed"));
 						}
+					};
+				}
+
+				//keep photos on camera
+				{
+					this->customParameters.keepPhotosOnCamera->getDeviceValueFunction = [this]() {
+						return this->device.getKeepFilesOnDevice();
+					};
+					this->customParameters.keepPhotosOnCamera->setDeviceValueFunction = [this](const bool& value) {
+						return this->device.setKeepFilesOnDevice(value);
 					};
 				}
 			}

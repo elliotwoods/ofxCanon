@@ -1,5 +1,5 @@
 #include "RemoteDevice.h"
-#include "PutRequest.h"
+#include "CustomRequest.h"
 
 #define LOG_ERROR ofLogError("ofxCanon::RemoteDevice")
 
@@ -179,6 +179,20 @@ namespace ofxCanon {
 		RemoteDevice::getBaseURL() const
 	{
 		return "http://" + this->hostname + ":8080/ccapi/ver100/";
+	}
+
+	//----------
+	void
+		RemoteDevice::setKeepFilesOnDevice(bool value)
+	{
+		this->keepFilesOnDevice = value;
+	}
+
+	//----------
+	bool
+		RemoteDevice::getKeepFilesOnDevice() const
+	{
+		return this->keepFilesOnDevice;
 	}
 
 	//----------
@@ -493,7 +507,11 @@ namespace ofxCanon {
 
 		if (json.contains("addedcontents")) {
 			for (const auto& filenameJson : json["addedcontents"]) {
-				this->getFileFromCamera(filenameJson.get<string>());
+				auto filepath = filenameJson.get<string>();
+				this->getFileFromCamera(filepath);
+				if (!this->keepFilesOnDevice) {
+					this->deleteFileOnCamera(filepath);
+				}
 			}
 		}
 	}
@@ -505,6 +523,19 @@ namespace ofxCanon {
 		auto response = ofLoadURL("http://" + this->hostname + ":8080" + address);
 		if (response.status == 200) {
 			this->incomingImages.send(response.data);
+		}
+	}
+
+	//----------
+	void
+		RemoteDevice::deleteFileOnCamera(const string& address)
+	{
+		auto url = "http://" + this->hostname + ":8080" + address;
+		auto response = sendCustomRequest(url, nlohmann::json(), 1.0, "DELETE");
+
+		if (response.status != 200) {
+			auto responseJson = nlohmann::json::parse(response.data);
+			LOG_ERROR << responseJson;
 		}
 	}
 
@@ -529,10 +560,10 @@ namespace ofxCanon {
 	{
 		auto url = this->getBaseURL() + address;
 
-		auto response = sendPutRequest(this->getBaseURL() + address, requestBody, 1.0);
+		auto response = sendCustomRequest(this->getBaseURL() + address, requestBody, 1.0, "PUT");
 
 		if (response.status != 200) {
-			LOG_ERROR << "Couldn't put to : " << address;
+			LOG_ERROR << "Couldn't put to : " << address << " : " << response.data;
 			return nlohmann::json();
 		}
 		else {

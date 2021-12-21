@@ -48,7 +48,7 @@
     <ClInclude Include="..\src\ofxCanon\RemoteDevice.h">
       <Filter>src\ofxCanon</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\ofxCanon\PutRequest.h">
+    <ClInclude Include="..\src\ofxCanon\CustomRequest.h">
       <Filter>src\ofxCanon</Filter>
     </ClInclude>
   </ItemGroup>
@@ -71,7 +71,7 @@
     <ClCompile Include="..\src\ofxCanon\RemoteDevice.cpp">
       <Filter>src\ofxCanon</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\ofxCanon\PutRequest.cpp">
+    <ClCompile Include="..\src\ofxCanon\CustomRequest.cpp">
       <Filter>src\ofxCanon</Filter>
     </ClCompile>
   </ItemGroup>

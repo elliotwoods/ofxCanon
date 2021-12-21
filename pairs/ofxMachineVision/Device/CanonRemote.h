@@ -9,7 +9,6 @@ namespace ofxMachineVision {
 			struct InitialisationSettings : public Base::InitialisationSettings {
 				InitialisationSettings();
 				ofParameter<string> hostname{ "Hostname", "172.30.1.100" };
-				ofParameter<bool> deleteRemote{ "Delete remote", false };
 			};
 
 			CanonRemote();
@@ -41,6 +40,7 @@ namespace ofxMachineVision {
 				shared_ptr<ofxMachineVision::Parameter<int>> iso;
 				shared_ptr<ofxMachineVision::Parameter<float>> aperture;
 				shared_ptr<ofxMachineVision::Parameter<float>> shutterSpeed;
+				shared_ptr<ofxMachineVision::Parameter<bool>> keepPhotosOnCamera;
 			} customParameters;
 		};
 	}

@@ -1,4 +1,4 @@
-#include "PutRequest.h"
+#include "CustomRequest.h"
 
 #include <curl/curl.h>
 
@@ -25,7 +25,7 @@ size_t saveToMemory_cb(void* buffer, size_t size, size_t nmemb, void* userdata) 
 	return size * nmemb;
 }
 
-ofHttpResponse sendPutRequest(const std::string & url, const nlohmann::json & requestBody, long timeout)
+ofHttpResponse sendCustomRequest(const std::string & url, const nlohmann::json & requestBody, long timeout, std::string requestType)
 {
 	auto hnd = curl_easy_init();
 	
@@ -34,11 +34,13 @@ ofHttpResponse sendPutRequest(const std::string & url, const nlohmann::json & re
 	
 	curl_easy_setopt(hnd, CURLOPT_HTTPHEADER, headers);
 	curl_easy_setopt(hnd, CURLOPT_URL, url.c_str());
-	curl_easy_setopt(hnd, CURLOPT_CUSTOMREQUEST, "PUT");
+	curl_easy_setopt(hnd, CURLOPT_CUSTOMREQUEST, requestType.c_str());
 
 	std::string requestBodyString = requestBody.dump();
-	curl_easy_setopt(hnd, CURLOPT_POSTFIELDS, requestBodyString.data());
-	curl_easy_setopt(hnd, CURLOPT_POSTFIELDSIZE, requestBodyString.size());
+	if (!requestBody.empty()) {
+		curl_easy_setopt(hnd, CURLOPT_POSTFIELDS, requestBodyString.data());
+		curl_easy_setopt(hnd, CURLOPT_POSTFIELDSIZE, requestBodyString.size());
+	}
 
 	curl_easy_setopt(hnd, CURLOPT_TIMEOUT, timeout);
 
