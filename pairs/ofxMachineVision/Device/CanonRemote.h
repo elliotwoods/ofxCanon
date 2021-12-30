@@ -41,6 +41,8 @@ namespace ofxMachineVision {
 				shared_ptr<ofxMachineVision::Parameter<float>> aperture;
 				shared_ptr<ofxMachineVision::Parameter<float>> shutterSpeed;
 				shared_ptr<ofxMachineVision::Parameter<bool>> keepPhotosOnCamera;
+				shared_ptr<ofxMachineVision::Parameter<bool>> downloadJPEG;
+				shared_ptr<ofxMachineVision::Parameter<bool>> downloadRAW;
 			} customParameters;
 		};
 	}

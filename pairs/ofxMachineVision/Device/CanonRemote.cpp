@@ -17,7 +17,9 @@ namespace ofxMachineVision {
 			this->customParameters.iso = make_shared<ofxMachineVision::Parameter<int>>(ofParameter<int>("ISO", 400));
 			this->customParameters.aperture = make_shared<ofxMachineVision::Parameter<float>>(ofParameter<float>("Aperture", 9, 0, 22));
 			this->customParameters.shutterSpeed = make_shared<ofxMachineVision::Parameter<float>>(ofParameter<float>("Shutter Speed", 1. / 30., 0, 60));
-			this->customParameters.keepPhotosOnCamera = make_shared<ofxMachineVision::Parameter<bool>>(ofParameter<bool>("Keep photos on camera", true));
+			this->customParameters.keepPhotosOnCamera = make_shared<ofxMachineVision::Parameter<bool>>(ofParameter<bool>("Keep photos on camera", false));
+			this->customParameters.downloadJPEG = make_shared<ofxMachineVision::Parameter<bool>>(ofParameter<bool>("Download JPEG", true));
+			this->customParameters.downloadRAW = make_shared<ofxMachineVision::Parameter<bool>>(ofParameter<bool>("Download RAW", true));
 
 			// Add to this->parameters 
 			this->parameters.insert(this->parameters.end()
@@ -27,6 +29,8 @@ namespace ofxMachineVision {
 					, this->customParameters.aperture
 					, this->customParameters.shutterSpeed
 					, this->customParameters.keepPhotosOnCamera
+					, this->customParameters.downloadJPEG
+					, this->customParameters.downloadRAW
 				});
 
 			// Attach actions to the parameters
@@ -110,6 +114,26 @@ namespace ofxMachineVision {
 					};
 					this->customParameters.keepPhotosOnCamera->setDeviceValueFunction = [this](const bool& value) {
 						return this->device.setKeepFilesOnDevice(value);
+					};
+				}
+
+				//download JPEG
+				{
+					this->customParameters.downloadJPEG->getDeviceValueFunction = [this]() {
+						return this->device.getDownloadJPEG();
+					};
+					this->customParameters.downloadJPEG->setDeviceValueFunction = [this](const bool& value) {
+						return this->device.setDownloadJPEG(value);
+					};
+				}
+
+				//download RAW
+				{
+					this->customParameters.downloadRAW->getDeviceValueFunction = [this]() {
+						return this->device.getDownloadRAW();
+					};
+					this->customParameters.downloadRAW->setDeviceValueFunction = [this](const bool& value) {
+						return this->device.setDownloadRAW(value);
 					};
 				}
 			}

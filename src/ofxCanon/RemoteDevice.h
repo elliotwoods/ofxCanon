@@ -40,6 +40,11 @@ namespace ofxCanon {
 		void setKeepFilesOnDevice(bool);
 		bool getKeepFilesOnDevice() const;
 
+		void setDownloadJPEG(bool);
+		bool getDownloadJPEG() const;
+		void setDownloadRAW(bool);
+		bool getDownloadRAW() const;
+
 		bool getShootingMode(string &) const;
 		bool setShootingMode(const string&);
 
@@ -85,7 +90,9 @@ namespace ofxCanon {
 		bool frameIsNew = false;
 		ofImage image;
 
-		bool keepFilesOnDevice = true;
+		bool keepFilesOnDevice = false;
+		bool downloadJPEG = true;
+		bool downloadRAW = false;
 
 		bool waitingForPhoto = false;
 

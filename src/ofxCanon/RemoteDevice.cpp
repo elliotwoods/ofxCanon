@@ -26,6 +26,7 @@ namespace ofxCanon {
 		{
 			request.method = ofHttpRequest::GET;
 			request.url = "http://" + hostname + ":8080/ccapi/ver100/deviceinformation";
+			request.timeoutSeconds = 5.0;
 		}
 		auto response = this->urlLoader.handleRequest(request);
 		if (response.status != 200) {
@@ -193,6 +194,34 @@ namespace ofxCanon {
 		RemoteDevice::getKeepFilesOnDevice() const
 	{
 		return this->keepFilesOnDevice;
+	}
+
+	//----------
+	void
+		RemoteDevice::setDownloadJPEG(bool value)
+	{
+		this->downloadJPEG = value;
+	}
+
+	//----------
+	bool
+		RemoteDevice::getDownloadJPEG() const
+	{
+		return this->downloadJPEG;
+	}
+
+	//----------
+	void
+		RemoteDevice::setDownloadRAW(bool value)
+	{
+		this->downloadRAW = value;
+	}
+
+	//----------
+	bool
+		RemoteDevice::getDownloadRAW() const
+	{
+		return this->downloadRAW;
 	}
 
 	//----------
@@ -413,28 +442,28 @@ namespace ofxCanon {
 		RemoteDevice::convertShutterSpeedToDevice(float value) const
 	{
 		// get all options
-		map<float, string> optionsByValue;
-		{
-			auto optionStrings = this->getOptions("shooting/settings/tv");
-			for (const auto& optionString : optionStrings) {
-				auto optionValue = this->convertShutterSpeedFromDevice(optionString);
-				optionsByValue.emplace(optionValue, optionString);
-			}
-		}
+map<float, string> optionsByValue;
+{
+	auto optionStrings = this->getOptions("shooting/settings/tv");
+	for (const auto& optionString : optionStrings) {
+		auto optionValue = this->convertShutterSpeedFromDevice(optionString);
+		optionsByValue.emplace(optionValue, optionString);
+	}
+}
 
-		if (optionsByValue.empty()) {
-			LOG_ERROR << "Failed to get options";
-			return "";
-		}
-			
-		// find closest option
-		auto find = optionsByValue.lower_bound(value);
-		if (find != optionsByValue.end()) {
-			return find->second;
-		}
-		else {
-			return optionsByValue.rbegin()->second;
-		}
+if (optionsByValue.empty()) {
+	LOG_ERROR << "Failed to get options";
+	return "";
+}
+
+// find closest option
+auto find = optionsByValue.lower_bound(value);
+if (find != optionsByValue.end()) {
+	return find->second;
+}
+else {
+	return optionsByValue.rbegin()->second;
+}
 	}
 
 	//----------
@@ -508,7 +537,14 @@ namespace ofxCanon {
 		if (json.contains("addedcontents")) {
 			for (const auto& filenameJson : json["addedcontents"]) {
 				auto filepath = filenameJson.get<string>();
-				this->getFileFromCamera(filepath);
+				auto extension = ofToLower(ofFilePath::getFileExt(filepath));
+
+				if ((extension == "jpeg" || extension == "jpg") && this->downloadJPEG) {
+					this->getFileFromCamera(filepath);
+				}
+				if ((extension == "cr2" || extension == "cr3") && this->downloadRAW) {
+					this->getFileFromCamera(filepath);
+				}
 				if (!this->keepFilesOnDevice) {
 					this->deleteFileOnCamera(filepath);
 				}
